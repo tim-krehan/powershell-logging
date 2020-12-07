@@ -14,7 +14,9 @@ Copy-Item -Path $source -Destination $userModulePath -Force -Recurse
 ``` powershell
 Write-Log INFO "i am a info logline"
 ```
-` PS> 2020.12.07 11:58:39.677 -    INFO - b550@baugruppe.de : i am a informational logline `
+```
+PS> 2020.12.07 11:58:39.677 -    INFO - b550@baugruppe.de : i am a informational logline
+```
 ### Get-LogConfig
 ``` powershell
 Get-LogConfig
