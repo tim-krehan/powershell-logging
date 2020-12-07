@@ -24,3 +24,7 @@ $manifestData = @{
     LicenseUri = "https://git.brz.de/powershell-modules/poshlogging/-/blob/master/LICENSE"
 }
 $exportManifestItem = New-ModuleManifest @manifestData
+
+# sign exported Module
+$signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
+Set-AuthenticodeSignature -FilePath $exportModuleItem -Certificate $signingCertificate
