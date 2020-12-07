@@ -4,7 +4,7 @@
 2. extract the files
 3. open the PowerShell in the new folder
 4. execute the following command:
-``` PowerShell
+``` powershell
 $source = ".\export\PoShLogging"
 $userModulePath = $env:PSModulePath.split(";") |Where-Object -FilterScript {$_ -like "*$env:USERNAME*Windows*PowerShell*"}
 Copy-Item -Path $source -Destination $userModulePath -Force -Recurse
