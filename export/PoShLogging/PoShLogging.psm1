@@ -1,14 +1,45 @@
+enum Severity {
+    DEBUG
+    VERBOSE
+    INFO
+    WARNING
+    SUCCESS
+    ERROR
+}
+Class LogLine{
+    [DateTime]$TimeStamp
+    [string]$User
+    [Severity]$Severity
+}
+function Get-LDefaultConfig(){
+    return [PSCustomObject]@{
+        ModuleName = "PoShLogging"
+        UserConfigFolder = "$env:APPDATA\PoShLogging"
+    }
+}
+function Get-LUserConfig(){
+    if(Test-Path "$env:APPDATA\PoShLogging\config.json"){
+        return Get-Content -Path "$env:APPDATA\PoShLogging\config.json" | ConvertFrom-Json
+    }
+    else{
+        return @{}
+    }
+}
+function Merge-LConfig(){
+    $defaultConfig = Get-LDefaultConfig
+    $userConfig = Get-LUserConfig
+    foreach ($member in ($defaultConfig |Get-Member -MemberType Properties |Select-Object -ExpandProperty "Name")) {
+        if($null -eq $userConfig.$member){
+            $userConfig |Add-Member -MemberType NoteProperty -Name $member -Value $defaultConfig.$member}
+    }
+    return $userConfig
+}
 function Get-LogConfig(){
     param()
     begin {
-        $configFolder =  "$env:APPDATA\b550.log"
-        if(!(Test-Path $configFolder)){New-Item -Path $configFolder -ItemType Directory}
-        $configFile = "$configFolder\config.json"
-        if(!(Test-Path $configFile)){New-Item -Path $configFile -ItemType File -Value "{}" |Out-Null}
-        [pscustomobject]$currentConfig = Get-Content $configFile |ConvertFrom-Json
     }
     process{
-        return $currentConfig
+        return Merge-LConfig
     }
     end{
 
@@ -30,7 +61,7 @@ function Set-LogConfig(){
         $InputObject
     )
     begin {
-        $configFolder =  "$env:APPDATA\b550.log"
+        $configFolder =  "$env:APPDATA\$((Get-DefaultParameter).ModuleName)"
         if(!(Test-Path $configFolder)){New-Item -Path $configFolder -ItemType Directory}
         $configFile = "$configFolder\config.json"
         if(!(Test-Path $configFile)){New-Item -Path $configFile -ItemType File -Value "{}"}
@@ -103,7 +134,524 @@ function Write-Log(){
         $logname = "powershell"
     )
     begin{
-        $configFile = "$env:APPDATA\b550.log\config.json"
+        $configFile = "$env:APPDATA\$((Get-DefaultParameter).ModuleName)\config.json"
+        if(Test-path $configFile){
+            $defaultConfig = Get-Content $configFile |ConvertFrom-Json
+            if($null -ne $defaultConfig.Location){
+                $logfile = $defaultConfig.Location
+            }
+            else{
+                $logfile = "~"
+            }
+            if($null -ne $defaultConfig.LogName){
+                if($null -eq $logname){
+                    $logfile += "\" + $defaultConfig.LogName
+                }
+                else{
+                    $logfile += "\$logname"
+                }
+            }
+            else{
+                $logfile += "\powershell"
+            }
+            $logfile += ".log"
+        }
+        else{
+            if([string]::IsNullOrEmpty($logname)){
+                $logfile = "~\powershell.log"
+            }
+            else{
+                $logfile = "~\$logname.log"
+            }
+        }
+    }
+    process {
+        $executionTime = Get-Date -Format "yyyy.MM.dd HH:mm:ss.fff"
+        $user = $env:USERNAME
+        $domain = $env:USERDNSDOMAIN
+        $line = "$executionTime - $($severity.ToUpper().PadLeft(7, " ")) - $($user.ToLower())@$($domain.tolower()) : $logline"
+        Out-File -InputObject $line -FilePath $logfile -Encoding utf8 -Append -Width $line.ToCharArray().length -ErrorAction SilentlyContinue
+        switch ($severity) {
+            "SUCCESS" {
+                Write-Host -Object $line -ForegroundColor Green
+                break
+             }
+             "NOTICE" {
+                 Write-Host -Object $line -ForegroundColor White
+                 break
+              }
+            "INFO" {
+                Write-Host -Object $line -ForegroundColor Cyan
+                break
+             }
+            "WARNING" {
+                Write-Host -Object $line -ForegroundColor Yellow
+                break
+             }
+            "ERROR" {
+                Write-Host -Object $line -ForegroundColor Red
+                break
+             }
+        }
+    }
+    end{}
+}
+Class Severity{
+    
+}
+Class LogLine{
+    [DateTime]$TimeStamp
+    [string]$User
+    [Severity]$Severity
+    [String]$Message
+
+    LogLine(){
+
+    }
+    ToString(){
+        "$($this.TimeStamp)"
+    }
+}
+function Get-LDefaultConfig(){
+    return [PSCustomObject]@{
+        ModuleName = "PoShLogging"
+        UserConfigFolder = "$env:APPDATA\PoShLogging"
+    }
+}
+function Get-LUserConfig(){
+    if(Test-Path "$env:APPDATA\PoShLogging\config.json"){
+        return Get-Content -Path "$env:APPDATA\PoShLogging\config.json" | ConvertFrom-Json
+    }
+    else{
+        return @{}
+    }
+}
+function Merge-LConfig(){
+    $defaultConfig = Get-LDefaultConfig
+    $userConfig = Get-LUserConfig
+    foreach ($member in ($defaultConfig |Get-Member -MemberType Properties |Select-Object -ExpandProperty "Name")) {
+        if($null -eq $userConfig.$member){
+            $userConfig |Add-Member -MemberType NoteProperty -Name $member -Value $defaultConfig.$member}
+    }
+    return $userConfig
+}
+function Get-LogConfig(){
+    param()
+    begin {
+    }
+    process{
+        return Merge-LConfig
+    }
+    end{
+
+    }
+}
+function Set-LogConfig(){
+    [CMDLetBinding(DefaultParameterSetName="default")]
+    param(
+        [parameter(parameterSetName="default")]
+        [string]
+        $Location,
+
+        [parameter(parameterSetName="default")]
+        [string]
+        $LogName,
+
+        [parameter(ValueFromPipeline=$true,Mandatory=$true,ParameterSetName="pipeline")]
+        [PSCustomObject]
+        $InputObject
+    )
+    begin {
+        $configFolder =  "$env:APPDATA\$((Get-DefaultParameter).ModuleName)"
+        if(!(Test-Path $configFolder)){New-Item -Path $configFolder -ItemType Directory}
+        $configFile = "$configFolder\config.json"
+        if(!(Test-Path $configFile)){New-Item -Path $configFile -ItemType File -Value "{}"}
+        [pscustomobject]$currentConfig = Get-Content $configFile |ConvertFrom-Json
+    }
+    process{
+        if(![string]::IsNullOrEmpty($InputObject)){
+            foreach($key in ($InputObject |Get-Member -MemberType NoteProperty |Select-Object -ExpandProperty name)){
+                Set-Variable -Name $key -Value $InputObject.$key
+            }
+        }
+        try{
+            # set defaultlLocation
+            if(![string]::IsNullOrEmpty($Location)){
+                if(!(Test-Path $Location)){
+                    throw "'$Location' ist nicht vorhanden!"
+                }
+                $LocationItem = Get-Item $Location
+                if($LocationItem.Attributes.toString().Split(",").Trim() -notcontains "Directory"){
+                    throw "'$Location' ist kein Ordner!"
+                }
+                if($null -eq $currentConfig.Location){
+                    Add-Member -InputObject $currentConfig -Name "Location" -Value $LocationItem.FullName -MemberType NoteProperty
+                }
+                else{
+                    $currentConfig.Location = $LocationItem.FullName
+                }
+            }
+
+            # set default name
+            if(![string]::IsNullOrEmpty($LogName)){
+                if($LogName.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars()) -gt 0){
+                    throw "'$LogName' enthält ungültige Zeichen!"
+                }
+                if($null -eq $currentConfig.LogName){
+                    Add-Member -InputObject $currentConfig -Name "LogName" -Value $LogName -MemberType NoteProperty
+                }
+                else{
+                    $currentConfig.LogName = $LogName
+                }
+            }
+        }
+        catch{
+            Write-Error $Error[0].Exception.Message
+        }
+    }
+    end{
+        $jsonConfig = $currentConfig |ConvertTo-Json -Depth 100 -Compress:$true
+        Out-File -InputObject $jsonConfig -FilePath $configFile -Encoding utf8 -Force
+    }
+}
+function Write-Log(){
+    [CMDLetBinding(PositionalBinding=$false)]
+    [Alias("ulog")]
+    param(
+        # severity of logline
+        [Parameter(Mandatory=$true, Position=0)]
+        [ValidateSet("NOTICE", "INFO", "SUCCESS", "WARNING", "ERROR")]
+        [string]
+        $severity,
+
+        # actual error text
+        [Parameter(Mandatory=$true, Position=1, ValueFromRemainingArguments=$true)]
+        [string]
+        $logline,
+
+        # logfile location
+        [Parameter(Mandatory=$false)]
+        [string]
+        $logname = "powershell"
+    )
+    begin{
+        $configFile = "$env:APPDATA\$((Get-DefaultParameter).ModuleName)\config.json"
+        if(Test-path $configFile){
+            $defaultConfig = Get-Content $configFile |ConvertFrom-Json
+            if($null -ne $defaultConfig.Location){
+                $logfile = $defaultConfig.Location
+            }
+            else{
+                $logfile = "~"
+            }
+            if($null -ne $defaultConfig.LogName){
+                if($null -eq $logname){
+                    $logfile += "\" + $defaultConfig.LogName
+                }
+                else{
+                    $logfile += "\$logname"
+                }
+            }
+            else{
+                $logfile += "\powershell"
+            }
+            $logfile += ".log"
+        }
+        else{
+            if([string]::IsNullOrEmpty($logname)){
+                $logfile = "~\powershell.log"
+            }
+            else{
+                $logfile = "~\$logname.log"
+            }
+        }
+    }
+    process {
+        $executionTime = Get-Date -Format "yyyy.MM.dd HH:mm:ss.fff"
+        $user = $env:USERNAME
+        $domain = $env:USERDNSDOMAIN
+        $line = "$executionTime - $($severity.ToUpper().PadLeft(7, " ")) - $($user.ToLower())@$($domain.tolower()) : $logline"
+        Out-File -InputObject $line -FilePath $logfile -Encoding utf8 -Append -Width $line.ToCharArray().length -ErrorAction SilentlyContinue
+        switch ($severity) {
+            "SUCCESS" {
+                Write-Host -Object $line -ForegroundColor Green
+                break
+             }
+             "NOTICE" {
+                 Write-Host -Object $line -ForegroundColor White
+                 break
+              }
+            "INFO" {
+                Write-Host -Object $line -ForegroundColor Cyan
+                break
+             }
+            "WARNING" {
+                Write-Host -Object $line -ForegroundColor Yellow
+                break
+             }
+            "ERROR" {
+                Write-Host -Object $line -ForegroundColor Red
+                break
+             }
+        }
+    }
+    end{}
+}
+Class Severity{
+    $Name
+    $Color
+    Severity($name){
+        switch($name){
+            "DEBUG" {
+                $this.Color = [System.ConsoleColor]::DarkBlue
+                $this.Name = "DEBUG"
+                break
+            }
+            "VERBOSE" {
+                $this.Color = [System.ConsoleColor]::DarkYellow
+                $this.Name = "VERBOSE"
+                break
+            }
+            "INFO" {
+                $this.Color = [System.ConsoleColor]::White
+                $this.Name = "INFO"
+                break
+            }
+            "WARNING" {
+                $this.Color = [System.ConsoleColor]::Yellow
+                $this.Name = "WARNING"
+                break
+            }
+            "SUCCESS" {
+                $this.Color = [System.ConsoleColor]::Green
+                $this.Name = "SUCCESS"
+                break
+            }
+            "ERROR" {
+                $this.Color = [System.ConsoleColor]::Red
+                $this.Name = "ERROR"
+                break
+            }
+            default {
+                break
+            }
+        }
+    }
+    [string] ToString(){
+        return $this.Name
+    }
+}
+Class LogLine{
+    [DateTime]$DateTime
+    [string]$User
+    [string]$Domain
+    [Severity]$Severity
+    [String]$Message
+    [bool]$Saved = $false
+
+    LogLine($severity, $message){
+        $this.DateTime = Get-Date
+        $this.User = $env:USERNAME.ToLower()
+        $this.Domain = $env:USERDNSDOMAIN.ToLower()
+        $this.Severity = [Severity]::new($severity)
+        $this.Message = $message.trim()
+    }
+    LogLine([string]$line){
+        $lineRegex = [regex]::new("(\d{4}\-\d{2}\-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{4})\s\-\s(.+?)@(.+?)\s\-\s+([A-Z]{1,7})\s\-\s(.+)$")
+        $match = $lineRegex.Match($line)
+        if($match.Success){
+            $this.DateTime = Get-Date $match.Groups[1].Value
+            $this.User = $match.Groups[2].Value
+            $this.Domain = $match.Groups[3].Value
+            $this.Severity = [Severity]::new($match.Groups[4].Value)
+            $this.Message = $match.Groups[5].Value.trim()
+        }
+        else{
+            Write-Warning "Skipping Line (Format not recognized)$([Environment]::NewLine)`t`"$line`""
+        }
+    }
+    [string] ToString(){
+        return "{0} - {1}@{2} - {3} - {4}" -f @(
+            (Get-Date $this.DateTime -Format "yyyy-MM-dd HH:mm:ss.ffff")
+            $this.User
+            $this.Domain
+            $this.Severity.Name.padLeft(7, " ")
+            $this.Message
+        )
+    }
+}
+Class LogFile{
+    [array]$LogLines
+    [string]$Name
+    [string]$FullName
+    [string]$Folder
+    [bool]$WriteThrough = $true
+
+    LogFile($name, $folder){
+        if(Test-Path -Path $folder){
+            $this.Folder = $folder
+            $this.Name = $name
+            $this.FullName = "{0}\{1}.log" -f $folder, $name
+            if(Test-Path -Path $this.FullName){
+                $this.Import()
+            }
+        }
+        else{
+            Write-Error "folder '$folder' not existant"
+        }
+    }
+    AddLine($severity, $message){
+        $logline = [LogLine]::new($severity, $message)
+        Write-Host -Object $logline.ToString() -ForegroundColor $logline.Severity.Color
+        $this.LogLines += $logline
+        if($this.WriteThrough){
+            $this.SaveFile()
+        }
+    }
+    SaveFile(){
+        $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
+        if($unsavedLines.Count -lt 1){Write-Error "nothing to save!"}
+        $newContent = $unsavedLines |ForEach-Object -Process {$_.ToString()}
+        $joinedContent = $newContent -join [Environment]::NewLine
+        try{
+            Out-File -InputObject $joinedContent -Append -FilePath $this.FullName -Encoding utf8
+            $unsavedLines |ForEach-Object -Process {$_.saved = $true}
+        }
+        catch{
+            Write-Error "Error Saving File"
+        }
+    }
+    Import(){
+        $availableContent = (Get-Content $this.FullName) -split [Environment]::NewLine
+        foreach($line in $availableContent){
+            $this.LogLines += [LogLine]::new($line)
+        }
+    }
+}
+function Get-LDefaultConfig(){
+    return [PSCustomObject]@{
+        ModuleName = "PoShLogging"
+        UserConfigFolder = "$env:APPDATA\PoShLogging"
+    }
+}
+function Get-LUserConfig(){
+    if(Test-Path "$env:APPDATA\PoShLogging\config.json"){
+        return Get-Content -Path "$env:APPDATA\PoShLogging\config.json" | ConvertFrom-Json
+    }
+    else{
+        return @{}
+    }
+}
+function Merge-LConfig(){
+    $defaultConfig = Get-LDefaultConfig
+    $userConfig = Get-LUserConfig
+    foreach ($member in ($defaultConfig |Get-Member -MemberType Properties |Select-Object -ExpandProperty "Name")) {
+        if($null -eq $userConfig.$member){
+            $userConfig |Add-Member -MemberType NoteProperty -Name $member -Value $defaultConfig.$member}
+    }
+    return $userConfig
+}
+function Get-LogConfig(){
+    param()
+    begin {
+    }
+    process{
+        return Merge-LConfig
+    }
+    end{
+
+    }
+}
+function Set-LogConfig(){
+    [CMDLetBinding(DefaultParameterSetName="default")]
+    param(
+        [parameter(parameterSetName="default")]
+        [string]
+        $Location,
+
+        [parameter(parameterSetName="default")]
+        [string]
+        $LogName,
+
+        [parameter(ValueFromPipeline=$true,Mandatory=$true,ParameterSetName="pipeline")]
+        [PSCustomObject]
+        $InputObject
+    )
+    begin {
+        $configFolder =  "$env:APPDATA\$((Get-DefaultParameter).ModuleName)"
+        if(!(Test-Path $configFolder)){New-Item -Path $configFolder -ItemType Directory}
+        $configFile = "$configFolder\config.json"
+        if(!(Test-Path $configFile)){New-Item -Path $configFile -ItemType File -Value "{}"}
+        [pscustomobject]$currentConfig = Get-Content $configFile |ConvertFrom-Json
+    }
+    process{
+        if(![string]::IsNullOrEmpty($InputObject)){
+            foreach($key in ($InputObject |Get-Member -MemberType NoteProperty |Select-Object -ExpandProperty name)){
+                Set-Variable -Name $key -Value $InputObject.$key
+            }
+        }
+        try{
+            # set defaultlLocation
+            if(![string]::IsNullOrEmpty($Location)){
+                if(!(Test-Path $Location)){
+                    throw "'$Location' ist nicht vorhanden!"
+                }
+                $LocationItem = Get-Item $Location
+                if($LocationItem.Attributes.toString().Split(",").Trim() -notcontains "Directory"){
+                    throw "'$Location' ist kein Ordner!"
+                }
+                if($null -eq $currentConfig.Location){
+                    Add-Member -InputObject $currentConfig -Name "Location" -Value $LocationItem.FullName -MemberType NoteProperty
+                }
+                else{
+                    $currentConfig.Location = $LocationItem.FullName
+                }
+            }
+
+            # set default name
+            if(![string]::IsNullOrEmpty($LogName)){
+                if($LogName.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars()) -gt 0){
+                    throw "'$LogName' enthält ungültige Zeichen!"
+                }
+                if($null -eq $currentConfig.LogName){
+                    Add-Member -InputObject $currentConfig -Name "LogName" -Value $LogName -MemberType NoteProperty
+                }
+                else{
+                    $currentConfig.LogName = $LogName
+                }
+            }
+        }
+        catch{
+            Write-Error $Error[0].Exception.Message
+        }
+    }
+    end{
+        $jsonConfig = $currentConfig |ConvertTo-Json -Depth 100 -Compress:$true
+        Out-File -InputObject $jsonConfig -FilePath $configFile -Encoding utf8 -Force
+    }
+}
+function Write-Log(){
+    [CMDLetBinding(PositionalBinding=$false)]
+    [Alias("ulog")]
+    param(
+        # severity of logline
+        [Parameter(Mandatory=$true, Position=0)]
+        [ValidateSet("NOTICE", "INFO", "SUCCESS", "WARNING", "ERROR")]
+        [string]
+        $severity,
+
+        # actual error text
+        [Parameter(Mandatory=$true, Position=1, ValueFromRemainingArguments=$true)]
+        [string]
+        $logline,
+
+        # logfile location
+        [Parameter(Mandatory=$false)]
+        [string]
+        $logname = "powershell"
+    )
+    begin{
+        $configFile = "$env:APPDATA\$((Get-DefaultParameter).ModuleName)\config.json"
         if(Test-path $configFile){
             $defaultConfig = Get-Content $configFile |ConvertFrom-Json
             if($null -ne $defaultConfig.Location){
@@ -169,8 +717,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUaJ7/A6X/P5n3xC2vnJ5F3MN6
-# FYWgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUQJ/6TU6WiZMBZcdUzpf1vx9y
+# LVKgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -265,11 +813,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUe+Ms0d+3NBdtonRm2xz46T6eE6cwDQYJKoZI
-# hvcNAQEBBQAEggEAL3e8lVuNaboW3t2sZAZ6xlR31lG/ma7GSG64VvyBaFYbb8CZ
-# bHHlbBHGOaMdAnnnT/xdldJ1hdvhipoZH1J4OhRwJ8IyGPgrEGxXVk/k+Gad3ztt
-# kyveaprMRWhgkksRIrUgOWNVEAGkectupZfdJ1P1i8qz8tEeMiXraAbr4wQ4ijVw
-# aIO43EkgR+4TmsI7aQ2VEV/W2M9NN7H/Q1hYApDuq6OVDN1ZyLa3Vj5dHFawNf8g
-# xXQXpS72gfHdQKnzFMfmVu4WYy9DRJXucj9jcKtWLNpRzeNQytv9Qp65N+JzNRiC
-# 9eyLDFUpi1ICu4YNUn4PxF+1KU3aieoBxtXMIQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUYGgO2e6PHH+ogE21qj4MxwFxXfcwDQYJKoZI
+# hvcNAQEBBQAEggEAg7wnKV99fvyavnd9zPzUizJMB/46xfzc+5XXYnfKPgv0r9jt
+# 4SnG1OdgvWr9N9BG16yqEpuDU7ehjMzOiGwK8KTtBEtYVWeu6dQTXmfFaaxRCmmb
+# 95cjoRrX+chOSrCaFZM8AVPnH2OB6xjkC5M1NRLqlO1O1Q9tUhqxxDGcmgywD5wt
+# xrCO50qkcausgbPIX2kVHcGRjyiF/5dkzHyv3jmKcwTQdje6l5z9IM0IwABfcBCk
+# lnCHBrQ256rn4TdUG9jkDwYvpbxVBobtVm77NFaQTJXKtf6sXA2LP1qc5+DGnn49
+# WWpPAkCXqzr0B6goOYpOPn1e+1DdNxSY4Tsp+Q==
 # SIG # End signature block

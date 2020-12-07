@@ -19,7 +19,7 @@ function Write-Log(){
         $logname = "powershell"
     )
     begin{
-        $configFile = "$env:APPDATA\b550.log\config.json"
+        $configFile = "$env:APPDATA\$((Get-DefaultParameter).ModuleName)\config.json"
         if(Test-path $configFile){
             $defaultConfig = Get-Content $configFile |ConvertFrom-Json
             if($null -ne $defaultConfig.Location){

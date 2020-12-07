@@ -14,7 +14,7 @@ function Set-LogConfig(){
         $InputObject
     )
     begin {
-        $configFolder =  "$env:APPDATA\b550.log"
+        $configFolder =  "$env:APPDATA\$((Get-DefaultParameter).ModuleName)"
         if(!(Test-Path $configFolder)){New-Item -Path $configFolder -ItemType Directory}
         $configFile = "$configFolder\config.json"
         if(!(Test-Path $configFile)){New-Item -Path $configFile -ItemType File -Value "{}"}
