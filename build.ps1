@@ -16,8 +16,8 @@ $functions = "$rootPath\{0}" -f $functionPath
 # create FormatFile File
 $exportFormatContent = Get-ChildItem -Path $format |Get-Content
 $exportFormatFullName = "$export\$moduleName\$moduleName.ps1xml"
-$exportModuleItem = New-Item -Path $exportFormatFullName -Force
-Set-Content -Path $exportModuleItem -Value $exportFormatContent
+$exportFormatItem = New-Item -Path $exportFormatFullName -Force
+Set-Content -Path $exportFormatItem -Value $exportFormatContent
 
 # create Module File
 $exportFunctionContent = Get-ChildItem -Path $class |Get-Content
@@ -46,3 +46,5 @@ New-ModuleManifest @manifestData
 # sign exported Module
 $signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
 Set-AuthenticodeSignature -FilePath $exportModuleItem -Certificate $signingCertificate
+Set-AuthenticodeSignature -FilePath $exportFormatItem -Certificate $signingCertificate
+Set-AuthenticodeSignature -FilePath $manifestData.path -Certificate $signingCertificate
