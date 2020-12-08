@@ -41,7 +41,10 @@ $manifestData = @{
     RootModule = "PoShLogging"
     ModuleVersion = Get-Content "$rootPath\version"
     FunctionsToExport = Get-ChildItem -Path $functions |Select-Object -ExpandProperty "BaseName"
-    FormatsToProcess = @("PoShLogging.LogLine.ps1xml", "PoShLogging.LogBook.ps1xml")
+    FormatsToProcess = @(
+        "PoShLogging.LogLine.ps1xml"
+        # "PoShLogging.LogBook.ps1xml"
+    )
     AliasesToExport = @("ulog")
     ProjectUri = "https://git.brz.de/powershell-modules/poshlogging"
     LicenseUri = "https://git.brz.de/powershell-modules/poshlogging/-/blob/master/LICENSE"

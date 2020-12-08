@@ -1,3 +1,3 @@
 function Get-Log(){
-    return $Script:LogConnection
+    return [LogBook]$Script:LogConnection
 }
