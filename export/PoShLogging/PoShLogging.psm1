@@ -85,11 +85,13 @@ Class LogFile{
     [string]$Name
     [string]$FullName
     [string]$Folder
+    [string[]]$LogLevels
     [array]$LogLines
     [bool]$WriteThrough = $true
 
-    LogFile($name, $folder){
+    LogFile($name, $folder, $loglevel){
         if(Test-Path -Path $folder){
+            $this.LogLevels = $loglevel
             $this.Folder = $folder
             $this.Name = $name
             $this.FullName = "{0}\{1}.log" -f $folder, $name
@@ -106,7 +108,9 @@ Class LogFile{
     }
     AddLine($severity, $message){
         $logline = [LogLine]::new($severity, $message)
-        Write-Host -Object $logline.ToString() -ForegroundColor $logline.Severity.Color
+        if($this.LogLevels -contains $logline.Severity.Name){
+            Write-Host -Object $logline.ToString() -ForegroundColor $logline.Severity.Color
+        }
         $this.LogLines += $logline
         if($this.WriteThrough){
             $this.SaveFile()
@@ -185,11 +189,39 @@ function Open-Log(){
     
         [Parameter(Mandatory=$false,Position=1)]
         [String]
-        $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
+        $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop),
+    
+        [switch]
+        $ShowDebug,
+
+        [switch]
+        $ShowVerbose,
+
+        [switch]
+        $ShowInfo,
+        
+        [switch]
+        $ShowWarning,
+        
+        [switch]
+        $ShowSuccess,
+        
+        [switch]
+        $ShowError
     )
     begin{}
     process{
-        $Script:LogConnection = [LogFile]::new($Name, $LogPath)
+        $LogLevel = @("INFO", "WARNING", "SUCCESS", "ERROR")
+        if($ShowDebug -or $ShowVerbose -or $ShowInfo -or $ShowWarning -or $ShowSuccess -or $ShowError){
+            $LogLevel = @()
+            if($ShowDebug){$LogLevel += "DEBUG"}
+            if($ShowVerbose){$LogLevel += "VERBOSE"}
+            if($ShowInfo){$LogLevel += "INFO"}
+            if($ShowWarning){$LogLevel += "WARNING"}
+            if($ShowSuccess){$LogLevel += "SUCCESS"}
+            if($ShowError){$LogLevel += "ERROR"}
+        }
+        $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
         return $Script:LogConnection
     }
     end{}
@@ -224,8 +256,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUaRVlESRs4pjfmZc4vu4zbroR
-# KF2gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUandFHBQAPEhpkRKO4R/IhvFz
+# 8l+gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -320,11 +352,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4RCv9gYjtjgI1IaLE1TynLrDggEwDQYJKoZI
-# hvcNAQEBBQAEggEAMDKqJBoIOQMuQP3TGOb+WSQRlKaJwdGO6MliASbffuSVETVi
-# H1VPk0thsvyfiu2gTKQEdqv/Rf6Z7n6mKTtnAuqxv28QEJioK6Snv8RRB2/3umlN
-# EW3edBvy7GVCri7Brb7cVo9XPV+SdQqCLxMPsGknshLxeGfWcpLP5GxhRt9/bXmS
-# dzEMr1lpznn+j+ckD+Jabvxy3wErUlwz7mo0SS7PnG4qJFVukzSnfKBoyZSF3ctB
-# KBFg2BbptosNcd3roqW8N8nyAsHSXE+aIgeMGxcbu2Ex299CMsz3CsaeVFenb14f
-# mIhA05jfykwKerhCWyGwCQfFp4pIPyrMl+sLZw==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUNXzbAboMSvn3z6tRL4/19JWv1XgwDQYJKoZI
+# hvcNAQEBBQAEggEAeOdJIfKV5PnYJ7OCmyG6B2DFX8trVLtSmLabISUVEyIOnG+Z
+# cROD4pJ5xVM1MEG82c0XV0TLHfySO9fTIqcJv0dVjmfZLfzSQXDtSEt3fsLed/uP
+# mwbPjVFA980436YwAIPfdHYHdRpkxk+wrBliVzuvze5pF+fC5/zyR0/lRyJnyiZe
+# FE9af0C2psHWRMZkavw9thPIzbWSbSNuBwA3CmNhjWJSM2DoutlcXR3lqOvezJf5
+# +gofXVj56y5Hb6fel7EKiyj4lkHtTO8xbbXJc8ciqADtngPnfXVFptKTWdhJivJR
+# D0mFedwnYYVJo4T5E2AUhx5nIi0g6VXUSlQjcQ==
 # SIG # End signature block

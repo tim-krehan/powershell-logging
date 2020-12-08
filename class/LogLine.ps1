@@ -85,11 +85,13 @@ Class LogFile{
     [string]$Name
     [string]$FullName
     [string]$Folder
+    [string[]]$LogLevels
     [array]$LogLines
     [bool]$WriteThrough = $true
 
-    LogFile($name, $folder){
+    LogFile($name, $folder, $loglevel){
         if(Test-Path -Path $folder){
+            $this.LogLevels = $loglevel
             $this.Folder = $folder
             $this.Name = $name
             $this.FullName = "{0}\{1}.log" -f $folder, $name
@@ -106,7 +108,9 @@ Class LogFile{
     }
     AddLine($severity, $message){
         $logline = [LogLine]::new($severity, $message)
-        Write-Host -Object $logline.ToString() -ForegroundColor $logline.Severity.Color
+        if($this.LogLevels -contains $logline.Severity.Name){
+            Write-Host -Object $logline.ToString() -ForegroundColor $logline.Severity.Color
+        }
         $this.LogLines += $logline
         if($this.WriteThrough){
             $this.SaveFile()
