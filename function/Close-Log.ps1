@@ -1,14 +1,14 @@
-function Clear-Log(){
-    param()
+function Close-Log(){
+    param(
+    )
     begin{
     }
-    process {
+    process{
         if($null -eq $Script:LogConnection){
             Write-Error "Use `"New-Log`" first, to connect to a logfile!"
             return
         }
-        $Script:LogConnection.Clear()
-        return Get-Log
+        Remove-Variable "LogConnection" -Scope "Script"
     }
     end{}
 }

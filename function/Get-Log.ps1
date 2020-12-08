@@ -1,11 +1,12 @@
 function Get-Log(){
     param()
     begin{
-        if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
-        }
     }
     process{
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            return
+        }
         return $Script:LogConnection
     }
     end{}

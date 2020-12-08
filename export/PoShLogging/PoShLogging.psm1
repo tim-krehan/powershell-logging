@@ -139,29 +139,45 @@ Class LogFile{
 function Clear-Log(){
     param()
     begin{
-        if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
-        }
     }
     process {
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            return
+        }
         $Script:LogConnection.Clear()
         return Get-Log
+    }
+    end{}
+}
+function Close-Log(){
+    param(
+    )
+    begin{
+    }
+    process{
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            return
+        }
+        Remove-Variable "LogConnection" -Scope "Script"
     }
     end{}
 }
 function Get-Log(){
     param()
     begin{
-        if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
-        }
     }
     process{
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            return
+        }
         return $Script:LogConnection
     }
     end{}
 }
-function New-Log(){
+function Open-Log(){
     param(
         [parameter(Mandatory=$true,Position=0)]
         [string]
@@ -194,11 +210,12 @@ function Write-Log(){
         $LogLine
     )
     begin{
-        if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
-        }
     }
     process {
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            return
+        }
         $Script:LogConnection.AddLine($Severity, $LogLine)
     }
     end{}
@@ -207,8 +224,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUDRFZ2udoQ1af3EYvwSnvwzkX
-# /8+gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUaRVlESRs4pjfmZc4vu4zbroR
+# KF2gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -303,11 +320,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUrlQ/03Zuj2SoTMLwFAeKJ8P2wvkwDQYJKoZI
-# hvcNAQEBBQAEggEAlRYo3cj/gMVhHTzqOaYb7djbyblvKiKuBCVXn2yVsAvxLDtX
-# PauaooKARmYqnYGhRpbEepF+CrIcPwKWwv/zky+M+pkDg6xWF33B81g+KV6lEdDl
-# uRTAdbGHI5fxGkd6dATTi5uD7A768pEjgnNlmN12NX8+QRech/lRjjCL4XFJhH+G
-# LFs9A1yuIvjVifVYcV4VU1XOrIqHo59S9xZvtWjHpGybyQUDZsnlKbGZ3Uxe6vH3
-# bdNuv6AlxHQKRc7OOTRiRt26ZtoEtVa6nHEBx8RO0AtNRqDZWlrCU6uQGf8AaV4w
-# VCOjEOwDtkq/4b7zKJzfXTsJOjzOjxrRLK2kGg==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU4RCv9gYjtjgI1IaLE1TynLrDggEwDQYJKoZI
+# hvcNAQEBBQAEggEAMDKqJBoIOQMuQP3TGOb+WSQRlKaJwdGO6MliASbffuSVETVi
+# H1VPk0thsvyfiu2gTKQEdqv/Rf6Z7n6mKTtnAuqxv28QEJioK6Snv8RRB2/3umlN
+# EW3edBvy7GVCri7Brb7cVo9XPV+SdQqCLxMPsGknshLxeGfWcpLP5GxhRt9/bXmS
+# dzEMr1lpznn+j+ckD+Jabvxy3wErUlwz7mo0SS7PnG4qJFVukzSnfKBoyZSF3ctB
+# KBFg2BbptosNcd3roqW8N8nyAsHSXE+aIgeMGxcbu2Ex299CMsz3CsaeVFenb14f
+# mIhA05jfykwKerhCWyGwCQfFp4pIPyrMl+sLZw==
 # SIG # End signature block

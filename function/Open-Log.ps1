@@ -1,4 +1,4 @@
-function New-Log(){
+function Open-Log(){
     param(
         [parameter(Mandatory=$true,Position=0)]
         [string]
