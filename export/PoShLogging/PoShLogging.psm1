@@ -82,10 +82,10 @@ Class LogLine{
     }
 }
 Class LogFile{
-    [array]$LogLines
     [string]$Name
     [string]$FullName
     [string]$Folder
+    [array]$LogLines
     [bool]$WriteThrough = $true
 
     LogFile($name, $folder){
@@ -95,6 +95,9 @@ Class LogFile{
             $this.FullName = "{0}\{1}.log" -f $folder, $name
             if(Test-Path -Path $this.FullName){
                 $this.Import()
+            }
+            else{
+                New-Item -Path $this.FullName -ItemType File
             }
         }
         else{
@@ -128,29 +131,6 @@ Class LogFile{
             $this.LogLines += [LogLine]::new($line)
         }
     }
-}
-function Get-LDefaultConfig(){
-    return [PSCustomObject]@{
-        ModuleName = "PoShLogging"
-        UserConfigFolder = "$env:APPDATA\PoShLogging"
-    }
-}
-function Get-LUserConfig(){
-    if(Test-Path "$env:APPDATA\PoShLogging\config.json"){
-        return Get-Content -Path "$env:APPDATA\PoShLogging\config.json" | ConvertFrom-Json
-    }
-    else{
-        return @{}
-    }
-}
-function Merge-LConfig(){
-    $defaultConfig = Get-LDefaultConfig
-    $userConfig = Get-LUserConfig
-    foreach ($member in ($defaultConfig |Get-Member -MemberType Properties |Select-Object -ExpandProperty "Name")) {
-        if($null -eq $userConfig.$member){
-            $userConfig |Add-Member -MemberType NoteProperty -Name $member -Value $defaultConfig.$member}
-    }
-    return $userConfig
 }
 function Get-Log(){
     return $Script:LogConnection
@@ -201,8 +181,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUQm622vIwk5N135ZrvJPXXKYU
-# P+CgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlrZ1r94RBEhmZp0tbBGfrAFW
+# 7cOgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -297,11 +277,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU9CevIUNrCVV5ZDGzDh2vLfbAeiYwDQYJKoZI
-# hvcNAQEBBQAEggEAXrLYO2G9zSpguPz5MR3ZsYeF97jrhdAUYaxVabIJBfbt7Y2o
-# KXVcH/6qYNeu5Odz9rXjVvKJjnqaALXNzx1Cjbzk5YJA57Kpm9i3UtdmismG31sM
-# NaoNrC3OAfUpOziRA6KfR7fYMOG977WnDJUutq36RDyzZCnIZlaLoNpImpCQoWK/
-# fyT9MOcMg4+uO0Um37f6Qr1lZRWrOHcHC5iQ06bKKNUFYHAELJdj/Yp4Vi5HrqnR
-# amj035k9WtHeYNDxmJ3XN1BvJpLTSon6MZbsLUEKBM9uJHXbO/TaMyLY5hE1cq4G
-# 5pJBvtTgOVJoYatgfkSf7IQ/yU0LyO5EzXlSXA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUxYvBjqbyXj5nwtfioNUnbzPbYcYwDQYJKoZI
+# hvcNAQEBBQAEggEAPUovgvX6KvMhExfVkXcYDBlo9mmuKhu1jvVMVaMGi0HVlV2W
+# OhzuCxeuc7lPm0ruIp4aRAAAcnzdpTnpNEhEyC4+sLF0yjeD50h6/+m0+RQPAFgd
+# cXOHoMJif/emFAcU9V5KXjsPgTgUqzRxrpWh+avmwRhd+qjx0GRe6Tmh8bx+o8Na
+# KOabhd00WWzLj+YAzWcYThQk75WupDzVZ6gtLhgcHq1Upq1cMC2Ex4UF7Rpk+Ka7
+# y1WiYcsyImn53CGxaNqOl/ruNzeYZzg2FWQ05eG0RZM6jcCR28MeJFqYY3HtVhHr
+# YhrHGhqW2HD7eC8sSnA6vg23tc6F3tRrYvZrMA==
 # SIG # End signature block

@@ -13,11 +13,8 @@ $format = "$rootPath\{0}" -f $formatPath
 $internals = "$rootPath\{0}" -f $internalPath
 $functions = "$rootPath\{0}" -f $functionPath
 
-# create FormatFile File
-$exportFormatContent = Get-ChildItem -Path $format |Get-Content
-$exportFormatFullName = "$export\$moduleName\$moduleName.ps1xml"
-$exportFormatItem = New-Item -Path $exportFormatFullName -Force
-Set-Content -Path $exportFormatItem -Value $exportFormatContent
+#remove contents of export folder
+Remove-Item -Path "$export\*" -Recurse
 
 # create Module File
 $exportFunctionContent = Get-ChildItem -Path $class |Get-Content
@@ -28,6 +25,14 @@ $exportModuleFullName = "$export\$moduleName\$moduleName.psm1"
 $exportModuleItem = New-Item -Path $exportModuleFullName -Force
 Set-Content -Path $exportModuleItem -Value $exportFunctionContent
 
+# create FormatFile File
+Get-ChildItem -Path $format |ForEach-Object -Process {
+    $exportFormatFile = $_
+    $formatContent = Get-Content -Path $exportFormatFile.FullName
+    Set-Content -Path "$export\$moduleName\$($exportFormatFile.BaseName).ps1xml" -Value $formatContent
+}
+# Set-Content -Path $exportLogFileFormatFullName -Value $exportFormatContent
+
 # create module date file
 $manifestData = @{
     Path = "$export\$moduleName\$moduleName.psd1"
@@ -36,7 +41,7 @@ $manifestData = @{
     RootModule = "PoShLogging"
     ModuleVersion = Get-Content "$rootPath\version"
     FunctionsToExport = Get-ChildItem -Path $functions |Select-Object -ExpandProperty "BaseName"
-    FormatsToProcess = "PoShLogging.ps1xml"
+    FormatsToProcess = @("PoShLogging.LogLine.ps1xml", "PoShLogging.LogBook.ps1xml")
     AliasesToExport = @("ulog")
     ProjectUri = "https://git.brz.de/powershell-modules/poshlogging"
     LicenseUri = "https://git.brz.de/powershell-modules/poshlogging/-/blob/master/LICENSE"
@@ -46,5 +51,4 @@ New-ModuleManifest @manifestData
 # sign exported Module
 $signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
 Set-AuthenticodeSignature -FilePath $exportModuleItem -Certificate $signingCertificate
-Set-AuthenticodeSignature -FilePath $exportFormatItem -Certificate $signingCertificate
 Set-AuthenticodeSignature -FilePath $manifestData.path -Certificate $signingCertificate

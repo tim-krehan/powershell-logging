@@ -82,10 +82,10 @@ Class LogLine{
     }
 }
 Class LogFile{
-    [array]$LogLines
     [string]$Name
     [string]$FullName
     [string]$Folder
+    [array]$LogLines
     [bool]$WriteThrough = $true
 
     LogFile($name, $folder){
@@ -95,6 +95,9 @@ Class LogFile{
             $this.FullName = "{0}\{1}.log" -f $folder, $name
             if(Test-Path -Path $this.FullName){
                 $this.Import()
+            }
+            else{
+                New-Item -Path $this.FullName -ItemType File
             }
         }
         else{
