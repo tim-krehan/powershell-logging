@@ -6,7 +6,7 @@ function Clear-Log(){
         }
     }
     process {
-        [LogBook]$Script:LogConnection.Clear()
+        $Script:LogConnection.Clear()
         return Get-Log
     }
     end{}

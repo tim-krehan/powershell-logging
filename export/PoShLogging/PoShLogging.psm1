@@ -114,7 +114,7 @@ Class LogFile{
     }
     Clear(){
         $this.LogLines = @()
-        New-Item -Path $this.FullName -ItemType File
+        New-Item -Path $this.FullName -ItemType File -Force
     }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
@@ -144,7 +144,7 @@ function Clear-Log(){
         }
     }
     process {
-        [LogBook]$Script:LogConnection.Clear()
+        $Script:LogConnection.Clear()
         return Get-Log
     }
     end{}
@@ -207,8 +207,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjfaerawyRvqGDt7Ose5aNiwQ
-# yTqgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUDRFZ2udoQ1af3EYvwSnvwzkX
+# /8+gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -303,11 +303,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUqlkkx7+Vdnoen5Vv+KrpcQozx5wwDQYJKoZI
-# hvcNAQEBBQAEggEAn5l0ePqmAlsHziECtLDXda8qC+oAbQQDNWkxd0wc08OFQXq7
-# xlmyNC6d6rEsUBvevv8W5Id1XgFGImz4dUpToTEQ4aNSg0nTUEPfXB0mQhCLv6fc
-# 4O9qJrFFsFN7n8aMrhbYmdRa6ZEAb0yvLTNBTZyXDeUKR9d07YFxgwOmNjFw8+Jr
-# 4+CZnnXVq8RQRq3Lr7iarWc39tZA6d6SL9qwl5XXZiofCpexCYfU39cVX008vz0h
-# RbwOy1RhGUbitJqvNt6QKXAMjPMGDk6rgeohOjTBM5T/k00AknbKZF5hKWW4BFJW
-# 7lrwGZiI65035LvuxAOAkOGCiVOQf7AXc9CVfQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUrlQ/03Zuj2SoTMLwFAeKJ8P2wvkwDQYJKoZI
+# hvcNAQEBBQAEggEAlRYo3cj/gMVhHTzqOaYb7djbyblvKiKuBCVXn2yVsAvxLDtX
+# PauaooKARmYqnYGhRpbEepF+CrIcPwKWwv/zky+M+pkDg6xWF33B81g+KV6lEdDl
+# uRTAdbGHI5fxGkd6dATTi5uD7A768pEjgnNlmN12NX8+QRech/lRjjCL4XFJhH+G
+# LFs9A1yuIvjVifVYcV4VU1XOrIqHo59S9xZvtWjHpGybyQUDZsnlKbGZ3Uxe6vH3
+# bdNuv6AlxHQKRc7OOTRiRt26ZtoEtVa6nHEBx8RO0AtNRqDZWlrCU6uQGf8AaV4w
+# VCOjEOwDtkq/4b7zKJzfXTsJOjzOjxrRLK2kGg==
 # SIG # End signature block

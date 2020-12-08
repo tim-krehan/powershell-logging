@@ -114,7 +114,7 @@ Class LogFile{
     }
     Clear(){
         $this.LogLines = @()
-        New-Item -Path $this.FullName -ItemType File
+        New-Item -Path $this.FullName -ItemType File -Force
     }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
