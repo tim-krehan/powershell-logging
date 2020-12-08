@@ -112,6 +112,10 @@ Class LogFile{
             $this.SaveFile()
         }
     }
+    Clear(){
+        $this.LogLines = @()
+        New-Item -Path $this.FullName -ItemType File
+    }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
         if($unsavedLines.Count -lt 1){Write-Error "nothing to save!"}

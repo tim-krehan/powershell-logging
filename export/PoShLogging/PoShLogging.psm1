@@ -112,6 +112,10 @@ Class LogFile{
             $this.SaveFile()
         }
     }
+    Clear(){
+        $this.LogLines = @()
+        New-Item -Path $this.FullName -ItemType File
+    }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
         if($unsavedLines.Count -lt 1){Write-Error "nothing to save!"}
@@ -132,8 +136,30 @@ Class LogFile{
         }
     }
 }
+function Clear-Log(){
+    param()
+    begin{
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+        }
+    }
+    process {
+        [LogBook]$Script:LogConnection.Clear()
+        return Get-Log
+    }
+    end{}
+}
 function Get-Log(){
-    return [LogBook]$Script:LogConnection
+    param()
+    begin{
+        if($null -eq $Script:LogConnection){
+            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+        }
+    }
+    process{
+        return $Script:LogConnection
+    }
+    end{}
 }
 function New-Log(){
     param(
@@ -181,8 +207,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU92tp5T9FPzHPjaayJu3WCz+W
-# 9tqgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjfaerawyRvqGDt7Ose5aNiwQ
+# yTqgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -277,11 +303,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUr3zHLxS6dJO36EwbIDRdPy4m210wDQYJKoZI
-# hvcNAQEBBQAEggEAWvoavuc0uVUn4Tac+6tRV+qUcr02ykQbTXgj8uBVIz1zJVeV
-# mRcDdhp7HFxAZQJAz1h+vBf3c4dBDth+QYwgneRGS1pnAoaOEhJ2Y72r/Z+7PMUR
-# TZVfWkYCDoKEMMI2n5uIMAu4Q7sSHhIqBjm/ZJjZdH7PTxUjOP9f2fHBy19u0If5
-# dd9oHEWxOjPsAo6UDpD2pWkFlA5CBiUczAIH1qYYKePuUqLsz3XdaPJbBp8w+5dA
-# v2dDNIR/2f3sv7rSiartIOrGqNHPl26xKgeYcCLF6SvP+qACmA/8xqmGLM/2eHbp
-# XiuliNjMDYEcYPNQjghPUGGzVCge7GnsQ8S5rA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUqlkkx7+Vdnoen5Vv+KrpcQozx5wwDQYJKoZI
+# hvcNAQEBBQAEggEAn5l0ePqmAlsHziECtLDXda8qC+oAbQQDNWkxd0wc08OFQXq7
+# xlmyNC6d6rEsUBvevv8W5Id1XgFGImz4dUpToTEQ4aNSg0nTUEPfXB0mQhCLv6fc
+# 4O9qJrFFsFN7n8aMrhbYmdRa6ZEAb0yvLTNBTZyXDeUKR9d07YFxgwOmNjFw8+Jr
+# 4+CZnnXVq8RQRq3Lr7iarWc39tZA6d6SL9qwl5XXZiofCpexCYfU39cVX008vz0h
+# RbwOy1RhGUbitJqvNt6QKXAMjPMGDk6rgeohOjTBM5T/k00AknbKZF5hKWW4BFJW
+# 7lrwGZiI65035LvuxAOAkOGCiVOQf7AXc9CVfQ==
 # SIG # End signature block
