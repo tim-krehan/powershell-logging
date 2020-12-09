@@ -146,7 +146,7 @@ function Clear-Log(){
     }
     process {
         if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"New-Log`" first, to connect to a logfile!"
             return
         }
         $Script:LogConnection.Clear()
@@ -161,7 +161,7 @@ function Close-Log(){
     }
     process{
         if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"New-Log`" first, to connect to a logfile!"
             return
         }
         Remove-Variable "LogConnection" -Scope "Script"
@@ -174,7 +174,7 @@ function Get-Log(){
     }
     process{
         if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"New-Log`" first, to connect to a logfile!"
             return
         }
         return $Script:LogConnection
@@ -245,7 +245,7 @@ function Write-Log(){
     }
     process {
         if($null -eq $Script:LogConnection){
-            Write-Error "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"New-Log`" first, to connect to a logfile!"
             return
         }
         $Script:LogConnection.AddLine($Severity, $LogLine)
@@ -256,8 +256,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUandFHBQAPEhpkRKO4R/IhvFz
-# 8l+gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUprhiWC8MeFHJNrLpJnvgY7Dl
+# sEqgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -352,11 +352,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUNXzbAboMSvn3z6tRL4/19JWv1XgwDQYJKoZI
-# hvcNAQEBBQAEggEAeOdJIfKV5PnYJ7OCmyG6B2DFX8trVLtSmLabISUVEyIOnG+Z
-# cROD4pJ5xVM1MEG82c0XV0TLHfySO9fTIqcJv0dVjmfZLfzSQXDtSEt3fsLed/uP
-# mwbPjVFA980436YwAIPfdHYHdRpkxk+wrBliVzuvze5pF+fC5/zyR0/lRyJnyiZe
-# FE9af0C2psHWRMZkavw9thPIzbWSbSNuBwA3CmNhjWJSM2DoutlcXR3lqOvezJf5
-# +gofXVj56y5Hb6fel7EKiyj4lkHtTO8xbbXJc8ciqADtngPnfXVFptKTWdhJivJR
-# D0mFedwnYYVJo4T5E2AUhx5nIi0g6VXUSlQjcQ==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0f49b912a0A2uf0r13WTfR2VQlowDQYJKoZI
+# hvcNAQEBBQAEggEABZqsvzR5lRBKq4AE45nw4dddkBF1mi/Zv7mmsm6C9h/YdE/i
+# JnFiy1PILBH1nzwoPuDmOl11ht+7wKUiL4fqVhf6XO5EfuLtWAYmw68cChdegAgW
+# dp7J9K7vYLKG3lm2cVrphbH0PirHAV55zgEKBYjXY6pULtULPXfVDwwKyu+aamCl
+# 2px1VpOjdYypZv03blqHpk26f9qy9erGyTw7c/5Dnrz9N9RNg3Lr9CHljWDpnVx1
+# 31YQm68FXDHM/082Dxpgb6bpz37u3wDxO1dVhYdyOxhawSG5hTGqdYFpec21GK+l
+# dgSeJ1r8eWL9INduBkVdZbTXUzeGsOAdKLjJ3Q==
 # SIG # End signature block
