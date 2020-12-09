@@ -1,4 +1,5 @@
 function Get-Log(){
+    [CmdletBinding()]
     param()
     begin{
     }

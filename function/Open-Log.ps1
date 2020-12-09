@@ -1,4 +1,5 @@
 function Open-Log(){
+    [CmdletBinding()]
     param(
         [parameter(Mandatory=$true,Position=0)]
         [string]
@@ -26,8 +27,10 @@ function Open-Log(){
         [switch]
         $ShowError
     )
-    begin{}
+    begin{
+    }
     process{
+        try{Close-Log}catch{}
         $LogLevel = @("INFO", "WARNING", "SUCCESS", "ERROR")
         if($ShowDebug -or $ShowVerbose -or $ShowInfo -or $ShowWarning -or $ShowSuccess -or $ShowError){
             $LogLevel = @()

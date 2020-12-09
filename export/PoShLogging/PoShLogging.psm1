@@ -92,9 +92,9 @@ Class LogFile{
     LogFile($name, $folder, $loglevel){
         if(Test-Path -Path $folder){
             $this.LogLevels = $loglevel
-            $this.Folder = $folder
+            $this.Folder = (Get-Item $folder).FullName
             $this.Name = $name
-            $this.FullName = "{0}\{1}.log" -f $folder, $name
+            $this.FullName = "{0}\{1}.log" -f $this.Folder, $name
             if(Test-Path -Path $this.FullName){
                 $this.Import()
             }
@@ -103,7 +103,7 @@ Class LogFile{
             }
         }
         else{
-            Write-Error "folder '$folder' not existant"
+            throw "folder '$folder' not existant"
         }
     }
     AddLine($severity, $message){
@@ -122,7 +122,7 @@ Class LogFile{
     }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
-        if($unsavedLines.Count -lt 1){Write-Error "nothing to save!"}
+        if($unsavedLines.Count -lt 1){throw "nothing to save!"}
         $newContent = $unsavedLines |ForEach-Object -Process {$_.ToString()}
         $joinedContent = $newContent -join [Environment]::NewLine
         try{
@@ -130,7 +130,7 @@ Class LogFile{
             $unsavedLines |ForEach-Object -Process {$_.saved = $true}
         }
         catch{
-            Write-Error "Error Saving File"
+            throw "Error Saving File"
         }
     }
     Import(){
@@ -141,6 +141,7 @@ Class LogFile{
     }
 }
 function Clear-Log(){
+    [CmdletBinding()]
     param()
     begin{
     }
@@ -150,13 +151,12 @@ function Clear-Log(){
             return
         }
         $Script:LogConnection.Clear()
-        return Get-Log
     }
     end{}
 }
 function Close-Log(){
-    param(
-    )
+    [CmdletBinding()]
+    param()
     begin{
     }
     process{
@@ -169,6 +169,7 @@ function Close-Log(){
     end{}
 }
 function Get-Log(){
+    [CmdletBinding()]
     param()
     begin{
     }
@@ -182,6 +183,7 @@ function Get-Log(){
     end{}
 }
 function Open-Log(){
+    [CmdletBinding()]
     param(
         [parameter(Mandatory=$true,Position=0)]
         [string]
@@ -209,8 +211,10 @@ function Open-Log(){
         [switch]
         $ShowError
     )
-    begin{}
+    begin{
+    }
     process{
+        try{Close-Log}catch{}
         $LogLevel = @("INFO", "WARNING", "SUCCESS", "ERROR")
         if($ShowDebug -or $ShowVerbose -or $ShowInfo -or $ShowWarning -or $ShowSuccess -or $ShowError){
             $LogLevel = @()
@@ -256,8 +260,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUprhiWC8MeFHJNrLpJnvgY7Dl
-# sEqgghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUD8iP6ZkT2I/lFc41RKkTD7e/
+# 0TugghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -352,11 +356,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQU0f49b912a0A2uf0r13WTfR2VQlowDQYJKoZI
-# hvcNAQEBBQAEggEABZqsvzR5lRBKq4AE45nw4dddkBF1mi/Zv7mmsm6C9h/YdE/i
-# JnFiy1PILBH1nzwoPuDmOl11ht+7wKUiL4fqVhf6XO5EfuLtWAYmw68cChdegAgW
-# dp7J9K7vYLKG3lm2cVrphbH0PirHAV55zgEKBYjXY6pULtULPXfVDwwKyu+aamCl
-# 2px1VpOjdYypZv03blqHpk26f9qy9erGyTw7c/5Dnrz9N9RNg3Lr9CHljWDpnVx1
-# 31YQm68FXDHM/082Dxpgb6bpz37u3wDxO1dVhYdyOxhawSG5hTGqdYFpec21GK+l
-# dgSeJ1r8eWL9INduBkVdZbTXUzeGsOAdKLjJ3Q==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQU6utv+olRQLjX5iO6hsEyZ9oDynEwDQYJKoZI
+# hvcNAQEBBQAEggEAgv1OOmMvZqBcn0sULCMEzBQ91te/TtD3O7YwHQSReY+7P6Ru
+# 7CIv1L9ktXIdsOdfPFWiTeUxk0MQ5rb4KMp+gHV/KDeim9WIgR3xjoojr1DIG9x7
+# Y7kK+dPxZC4bTd+O86YaRJAPsg6fJaxWN/b7ExRxbnJUxLZQOTM3z7iGC8RtVJ0L
+# 1j0HimPPUj4aaK6tS4cROBmI+dmni3KIxzgl2fYQecp5RsLSnI2QaSjVqQyzDhhy
+# pERVSOgcel0KpXIq4aiurxR+y82SoNp7P3snmSse8f2JxZAiDiaMyVZHR85Nf6/1
+# rsR4ioO0A0XAICqaU+DW9POpiNlDZZNYtqpdHw==
 # SIG # End signature block

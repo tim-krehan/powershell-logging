@@ -1,4 +1,5 @@
 function Clear-Log(){
+    [CmdletBinding()]
     param()
     begin{
     }
@@ -8,7 +9,6 @@ function Clear-Log(){
             return
         }
         $Script:LogConnection.Clear()
-        return Get-Log
     }
     end{}
 }

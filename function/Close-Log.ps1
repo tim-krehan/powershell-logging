@@ -1,6 +1,6 @@
 function Close-Log(){
-    param(
-    )
+    [CmdletBinding()]
+    param()
     begin{
     }
     process{

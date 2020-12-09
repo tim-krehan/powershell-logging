@@ -92,9 +92,9 @@ Class LogFile{
     LogFile($name, $folder, $loglevel){
         if(Test-Path -Path $folder){
             $this.LogLevels = $loglevel
-            $this.Folder = $folder
+            $this.Folder = (Get-Item $folder).FullName
             $this.Name = $name
-            $this.FullName = "{0}\{1}.log" -f $folder, $name
+            $this.FullName = "{0}\{1}.log" -f $this.Folder, $name
             if(Test-Path -Path $this.FullName){
                 $this.Import()
             }
@@ -103,7 +103,7 @@ Class LogFile{
             }
         }
         else{
-            Write-Error "folder '$folder' not existant"
+            throw "folder '$folder' not existant"
         }
     }
     AddLine($severity, $message){
@@ -122,7 +122,7 @@ Class LogFile{
     }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
-        if($unsavedLines.Count -lt 1){Write-Error "nothing to save!"}
+        if($unsavedLines.Count -lt 1){throw "nothing to save!"}
         $newContent = $unsavedLines |ForEach-Object -Process {$_.ToString()}
         $joinedContent = $newContent -join [Environment]::NewLine
         try{
@@ -130,7 +130,7 @@ Class LogFile{
             $unsavedLines |ForEach-Object -Process {$_.saved = $true}
         }
         catch{
-            Write-Error "Error Saving File"
+            throw "Error Saving File"
         }
     }
     Import(){
