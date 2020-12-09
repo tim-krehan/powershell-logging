@@ -55,3 +55,7 @@ New-ModuleManifest @manifestData
 $signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
 Set-AuthenticodeSignature -FilePath $exportModuleItem -Certificate $signingCertificate
 Set-AuthenticodeSignature -FilePath $manifestData.path -Certificate $signingCertificate
+Get-ChildItem -Path "$export\$moduleName\*.ps1xml" |ForEach-Object -Process {
+    $exportFormatFile = $_
+    Set-AuthenticodeSignature -FilePath $exportFormatFile.FullName -Certificate $signingCertificate
+}
