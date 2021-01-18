@@ -1,17 +1,11 @@
 $rootPath = $PSScriptRoot
 $moduleName = Get-Item -Path $rootPath |Select-Object -ExpandProperty "Name"
 
-$exportPath = "export"
-$classPath = "class"
-$formatPath = "format"
-$internalPath = "internal"
-$functionPath = "function"
-
-$export = "$rootPath\{0}" -f $exportPath
-$class = "$rootPath\{0}" -f $classPath
-$format = "$rootPath\{0}" -f $formatPath
-$internals = "$rootPath\{0}" -f $internalPath
-$functions = "$rootPath\{0}" -f $functionPath
+$export = "$rootPath\export"
+$class = "$rootPath\class"
+$format = "$rootPath\format"
+$internals = "$rootPath\internal"
+$functions = "$rootPath\function"
 
 #remove contents of export folder
 Remove-Item -Path "$export\*" -Recurse

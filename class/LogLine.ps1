@@ -136,7 +136,9 @@ Class LogFile{
     Import(){
         $availableContent = (Get-Content $this.FullName) -split [Environment]::NewLine
         foreach($line in $availableContent){
-            $this.LogLines += [LogLine]::new($line)
+            $newline = [LogLine]::new($line)
+            $newline.Saved = $true
+            $this.LogLines += $newline
         }
     }
 }
