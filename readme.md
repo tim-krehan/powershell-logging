@@ -1,34 +1,59 @@
-# Add easy logging to PowerShell!
-## Installation
-1. download the latest release from [git-releases](https://git.brz.de/powershell-modules/poshlogging/-/releases)
-2. extract the files
-3. open the PowerShell in the new folder
-4. execute the following command:
-``` powershell
-$source = ".\export\PoShLogging"
-$userModulePath = $env:PSModulePath.split(";") |Where-Object -FilterScript {$_ -like "*$env:USERNAME*Windows*PowerShell*"}
-Copy-Item -Path $source -Destination $userModulePath -Force -Recurse
-```
-## Usage
-### Write-Log
-``` powershell
-Write-Log INFO "i am a info logline"
-```
-```
-PS> 2020.12.07 11:58:39.677 -    INFO - steve@contoso.com : i am a informational logline
-```
-### Get-LogConfig
-``` powershell
-Get-LogConfig
-```
-```
-PS>
+# Add easy logging to PowerShell
 
-LogName    Location
--------    --------
-powershell C:\Users\Steve\Desktop
-```
-### Set-LogConfig
+## Installation
+
+1. download the latest release from [git-releases](https://github.com/tim-krehan/powershell-logging/releases)
+2. extract the files
+3. Open the Powershell in the extracted Folder
+4. Install the module with the following command:
+
 ``` powershell
-Set-LogConfig -Location "C:\Users\Steve\Desktop" -LogName "powershell"
+Get-Module ".\export\PoShLogging" -ListAvailable |install-module -Scope CurrentUser
 ```
+
+## Usage
+
+### Open-Log
+
+``` powershell
+Open-Log -Name "PowershellLogging" -ShowDebug -LogPath ".\LOG"
+```
+
+``` txt
+Name         : PowershellLogging
+FullName     : C:\Users\tim-krehan\LOG\PowershellLogging.log
+Folder       : C:\Users\tim-krehan\LOG
+LogLevels    : {DEBUG, INFO, WARNING, SUCCESS...}
+LogLines     :
+WriteThrough : True
+```
+
+### Write-Log
+
+``` powershell
+Write-Log INFO information
+```
+
+``` txt
+2021-01-18 14:38:05.9539 - b550@baugruppe.de -    INFO - information
+```
+
+### Get-Log
+
+``` powershell
+Get-Log |Select-Object -ExpandProperty "LogLines"
+```
+
+``` txt
+DateTime            User Domain       Severity Message
+--------            ---- ------       -------- -------    
+18.01.2021 14:38:05 b550 baugruppe.de INFO     information
+```
+
+### Clear-Log
+
+clears the current logfile completly
+
+### Close-Log
+
+disconnects from log (can be opend again with ` Open-Log `)
