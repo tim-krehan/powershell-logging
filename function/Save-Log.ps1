@@ -1,14 +1,14 @@
-function Clear-Log(){
+function Save-Log(){
     [CmdletBinding()]
     param()
     begin{
     }
-    process {
+    process{
         if($null -eq $Script:LogConnection){
             throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
-        $Script:LogConnection.Clear()
+        $Script:LogConnection.SaveFile()
     }
     end{}
 }

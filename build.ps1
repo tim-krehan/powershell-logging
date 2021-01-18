@@ -39,7 +39,7 @@ $manifestData = @{
         "PoShLogging.LogLine.ps1xml"
         # "PoShLogging.LogBook.ps1xml"
     )
-    AliasesToExport = @("ulog")
+    AliasesToExport = @("ulog", "Connect-Log")
     ProjectUri = "https://git.brz.de/powershell-modules/poshlogging"
     LicenseUri = "https://git.brz.de/powershell-modules/poshlogging/-/blob/master/LICENSE"
 }

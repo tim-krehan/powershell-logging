@@ -1,5 +1,6 @@
 function Open-Log(){
     [CmdletBinding()]
+    [Alias("Connect-Log")]
     param(
         [parameter(Mandatory=$true,Position=0)]
         [string]
@@ -25,23 +26,29 @@ function Open-Log(){
         $ShowSuccess,
         
         [switch]
-        $ShowError
+        $ShowError,
+
+        [switch]
+        $WriteThrough
     )
     begin{
+        if([string]::isnullorempty($PSBoundParameters.ShowInfo)){ $ShowInfo = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowWarning)){ $ShowWarning = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowSuccess)){ $ShowSuccess = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowError)){ $ShowError = $true }
+        if([string]::isnullorempty($PSBoundParameters.WriteThrough)){ $WriteThrough = $true }
     }
     process{
         try{Close-Log}catch{}
-        $LogLevel = @("INFO", "WARNING", "SUCCESS", "ERROR")
-        if($ShowDebug -or $ShowVerbose -or $ShowInfo -or $ShowWarning -or $ShowSuccess -or $ShowError){
-            $LogLevel = @()
-            if($ShowDebug){$LogLevel += "DEBUG"}
-            if($ShowVerbose){$LogLevel += "VERBOSE"}
-            if($ShowInfo){$LogLevel += "INFO"}
-            if($ShowWarning){$LogLevel += "WARNING"}
-            if($ShowSuccess){$LogLevel += "SUCCESS"}
-            if($ShowError){$LogLevel += "ERROR"}
-        }
+        $LogLevel = @()
+        if($ShowDebug){$LogLevel += "DEBUG"}
+        if($ShowVerbose){$LogLevel += "VERBOSE"}
+        if($ShowInfo){$LogLevel += "INFO"}
+        if($ShowWarning){$LogLevel += "WARNING"}
+        if($ShowSuccess){$LogLevel += "SUCCESS"}
+        if($ShowError){$LogLevel += "ERROR"}
         $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+        $Script:LogConnection.WriteThrough = $WriteThrough
         return $Script:LogConnection
     }
     end{}

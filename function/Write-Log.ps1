@@ -17,7 +17,7 @@ function Write-Log(){
     }
     process {
         if($null -eq $Script:LogConnection){
-            throw "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
         $Script:LogConnection.AddLine($Severity, $LogLine)

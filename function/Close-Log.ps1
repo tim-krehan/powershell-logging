@@ -5,7 +5,7 @@ function Close-Log(){
     }
     process{
         if($null -eq $Script:LogConnection){
-            throw "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
         Remove-Variable "LogConnection" -Scope "Script"

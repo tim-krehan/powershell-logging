@@ -149,7 +149,7 @@ function Clear-Log(){
     }
     process {
         if($null -eq $Script:LogConnection){
-            throw "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
         $Script:LogConnection.Clear()
@@ -163,7 +163,7 @@ function Close-Log(){
     }
     process{
         if($null -eq $Script:LogConnection){
-            throw "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
         Remove-Variable "LogConnection" -Scope "Script"
@@ -177,7 +177,7 @@ function Get-Log(){
     }
     process{
         if($null -eq $Script:LogConnection){
-            throw "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
         return $Script:LogConnection
@@ -186,6 +186,7 @@ function Get-Log(){
 }
 function Open-Log(){
     [CmdletBinding()]
+    [Alias("Connect-Log")]
     param(
         [parameter(Mandatory=$true,Position=0)]
         [string]
@@ -211,24 +212,44 @@ function Open-Log(){
         $ShowSuccess,
         
         [switch]
-        $ShowError
+        $ShowError,
+
+        [switch]
+        $WriteThrough
     )
     begin{
+        if([string]::isnullorempty($PSBoundParameters.ShowInfo)){ $ShowInfo = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowWarning)){ $ShowWarning = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowSuccess)){ $ShowSuccess = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowError)){ $ShowError = $true }
+        if([string]::isnullorempty($PSBoundParameters.WriteThrough)){ $WriteThrough = $true }
     }
     process{
         try{Close-Log}catch{}
-        $LogLevel = @("INFO", "WARNING", "SUCCESS", "ERROR")
-        if($ShowDebug -or $ShowVerbose -or $ShowInfo -or $ShowWarning -or $ShowSuccess -or $ShowError){
-            $LogLevel = @()
-            if($ShowDebug){$LogLevel += "DEBUG"}
-            if($ShowVerbose){$LogLevel += "VERBOSE"}
-            if($ShowInfo){$LogLevel += "INFO"}
-            if($ShowWarning){$LogLevel += "WARNING"}
-            if($ShowSuccess){$LogLevel += "SUCCESS"}
-            if($ShowError){$LogLevel += "ERROR"}
-        }
+        $LogLevel = @()
+        if($ShowDebug){$LogLevel += "DEBUG"}
+        if($ShowVerbose){$LogLevel += "VERBOSE"}
+        if($ShowInfo){$LogLevel += "INFO"}
+        if($ShowWarning){$LogLevel += "WARNING"}
+        if($ShowSuccess){$LogLevel += "SUCCESS"}
+        if($ShowError){$LogLevel += "ERROR"}
         $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+        $Script:LogConnection.WriteThrough = $WriteThrough
         return $Script:LogConnection
+    }
+    end{}
+}
+function Save-Log(){
+    [CmdletBinding()]
+    param()
+    begin{
+    }
+    process{
+        if($null -eq $Script:LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        $Script:LogConnection.SaveFile()
     }
     end{}
 }
@@ -251,7 +272,7 @@ function Write-Log(){
     }
     process {
         if($null -eq $Script:LogConnection){
-            throw "Use `"New-Log`" first, to connect to a logfile!"
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
         $Script:LogConnection.AddLine($Severity, $LogLine)
@@ -262,8 +283,8 @@ function Write-Log(){
 # SIG # Begin signature block
 # MIITmAYJKoZIhvcNAQcCoIITiTCCE4UCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUi418TR65AxfNyRmdkYAavxXW
-# O+ygghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUW0N7mQnQVeehsj5/u/FBUJPb
+# sb6gghEFMIIFoTCCBImgAwIBAgITIQAAAA9IvEBUBCwiDgAAAAAADzANBgkqhkiG
 # 9w0BAQsFADBJMRIwEAYKCZImiZPyLGQBGRYCZGUxGTAXBgoJkiaJk/IsZAEZFgli
 # YXVncnVwcGUxGDAWBgNVBAMTD0JhdWdydXBwZVJvb3RDQTAeFw0yMDAyMjkxMDA3
 # MDRaFw00MDAyMjQxMDA3MDRaMFExEjAQBgoJkiaJk/IsZAEZFgJkZTEZMBcGCgmS
@@ -358,11 +379,11 @@ function Write-Log(){
 # YmF1Z3J1cHBlMRQwEgYDVQQDEwtCYXVncnVwcGVDQQITGQAAGqJTwOQCDVY89gAC
 # AAAaojAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAigAoAAoQKAADAZBgkq
 # hkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgELMQ4wDAYKKwYBBAGC
-# NwIBFTAjBgkqhkiG9w0BCQQxFgQUdeRD8MGkB1LTUkoGjgQ7om82Z1YwDQYJKoZI
-# hvcNAQEBBQAEggEAsbD8xUgFDpOlfeH1Fpl+K6FfePIz9yfsYvaeGYd/b4fQcq+U
-# sXoR/YXQLRuPzXysIYGfpUVXS7iuhDCriuQfm9FiiSN+05t0YnRp1s+7rhIjGVOV
-# 5xXW+e4P587QdaUKyXJrnje3ZAre8E1Iwos7kN5q00enyNMoEKnevex/PdN8SeIP
-# E0Cy67scgApF2+odTiicSoA6yOzc5B2DElnmeg11PyUGXLiX+ONVweEw6EoknlGC
-# sie8As/7nsS4Keir5BO/wJtqeN+hVuxDaHPcMyMozK/raaHONW8uR33bMe96+y5x
-# 9MyROKpYiOxycrkvelL49KQAgNRP3W7nsp4HcA==
+# NwIBFTAjBgkqhkiG9w0BCQQxFgQUo1qN81nrgjI3T4WN74miHjAsSmIwDQYJKoZI
+# hvcNAQEBBQAEggEApV6F1TJQOFEzDNc0aIL1aB+g2ji8uW7QYDAjE7ERGpX1aTfL
+# UUhgXHsZYtpHczhBM9Gfiz1dfjw6a7VVQWkWWXDF8cHc+DUU//7JZLu9MuQTZ5SV
+# bxL3ReFRmT8TJpSrj90Mo1De6Vn5AKoZBsZoFduhjlxnqRhIZ5FGrQErEyDo6u1h
+# ohKZks9mQMk2jWsOwx9jR5PvW44ZbZcYvNYuF+uugUtyBLHa3MDvEjBbQN4xwpdp
+# NMmfhiCtSVOVP+ThvhxiV6jSoU7f0b2uhEXKu8X/I2GI1Ud77Loi35tncDRZb5+J
+# qxZUAeDcJJ9z0/GFx9s17YaGFRmiLmihBTxuLg==
 # SIG # End signature block
