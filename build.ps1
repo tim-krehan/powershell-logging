@@ -40,16 +40,16 @@ $manifestData = @{
         # "PoShLogging.LogBook.ps1xml"
     )
     AliasesToExport = @("ulog", "Connect-Log")
-    ProjectUri = "https://git.brz.de/powershell-modules/poshlogging"
-    LicenseUri = "https://git.brz.de/powershell-modules/poshlogging/-/blob/master/LICENSE"
+    ProjectUri = "https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging"
+    LicenseUri = "https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging/-/blob/master/LICENSE"
 }
 New-ModuleManifest @manifestData
 
 # sign exported Module
-$signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
-Set-AuthenticodeSignature -FilePath $exportModuleItem -Certificate $signingCertificate
-Set-AuthenticodeSignature -FilePath $manifestData.path -Certificate $signingCertificate
-Get-ChildItem -Path "$export\$moduleName\*.ps1xml" |ForEach-Object -Process {
-    $exportFormatFile = $_
-    Set-AuthenticodeSignature -FilePath $exportFormatFile.FullName -Certificate $signingCertificate
-}
+# $signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
+# Set-AuthenticodeSignature -FilePath $exportModuleItem -Certificate $signingCertificate
+# Set-AuthenticodeSignature -FilePath $manifestData.path -Certificate $signingCertificate
+# Get-ChildItem -Path "$export\$moduleName\*.ps1xml" |ForEach-Object -Process {
+#     $exportFormatFile = $_
+#     Set-AuthenticodeSignature -FilePath $exportFormatFile.FullName -Certificate $signingCertificate
+# }
