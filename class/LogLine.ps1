@@ -120,6 +120,22 @@ Class LogFile{
         $this.LogLines = @()
         New-Item -Path $this.FullName -ItemType File -Force
     }
+    Move($newLocation){
+        if(Test-Path -Path $newLocation){
+            $newLocationItem = Get-Item -Path $newLocation
+            if($newLocationItem -is [System.IO.DirectoryInfo]){
+                $dest = Move-Item -Path $this.FullName -Destination $newLocation -PassThru
+                $this.Folder = $dest.DirectoryName
+                $this.FullName = $dest.FullName
+            }
+            else{
+                throw "destination needs to be a folder"
+            }
+        }
+        else{
+            throw "folder '$newLocation' not existant"
+        }
+    }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
         if($unsavedLines.Count -lt 1){throw "nothing to save!"}
