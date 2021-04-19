@@ -136,6 +136,16 @@ Class LogFile{
             throw "folder '$newLocation' not existant"
         }
     }
+    Rename($newName){
+        if(-not(Test-Path -Path "$this.Folder\$newName")){
+            $dest = Rename-Item -Path $this.FullName -NewName "$newName.log" -PassThru
+            $this.Name = $dest.Name
+            $this.FullName = $dest.FullName
+        }
+        else{
+            throw "file '$newName' allready existant"
+        }
+    }
     SaveFile(){
         $unsavedLines = $this.LogLines |Where-Object -Property "Saved" -EQ $false
         if($unsavedLines.Count -lt 1){throw "nothing to save!"}
