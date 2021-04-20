@@ -35,7 +35,7 @@ Write-Log INFO information
 ```
 
 ``` txt
-2021-01-18 14:38:05.9539 - b550@baugruppe.de -    INFO - information
+2021-01-18 14:38:05.9539 - tim@krehan.de -    INFO - information
 ```
 
 ### Get-Log
@@ -47,7 +47,7 @@ Get-Log |Select-Object -ExpandProperty "LogLines"
 ``` txt
 DateTime            User Domain       Severity Message
 --------            ---- ------       -------- -------    
-18.01.2021 14:38:05 b550 baugruppe.de INFO     information
+18.01.2021 14:38:05  tim krehan.de    INFO     information
 ```
 
 ### Clear-Log
