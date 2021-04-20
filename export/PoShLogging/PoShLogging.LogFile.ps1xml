@@ -1,31 +1,27 @@
-<?xml version="1.0" encoding="utf-8" ?>
-    <Configuration>
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
     <ViewDefinitions>
         <View>
-            <Name>LogLine</Name>
+            <Name>LogFile</Name>
             <ViewSelectedBy>
-                <TypeName>LogLine</TypeName>
+                <TypeName>LogFile</TypeName>
             </ViewSelectedBy>
             <TableControl>
                 <TableHeaders>
                     <TableColumnHeader>
-                        <Label>DateTime</Label>
-                        <Alignment>left</Alignment>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>User</Label>
+                        <Label>Name</Label>
                         <Alignment>right</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>Domain</Label>
-                        <Alignment>left</Alignment>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>Severity</Label>
+                        <Label>LogLevels</Label>
                         <Alignment>right</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>Message</Label>
+                        <Label>WriteThrough</Label>
+                        <Alignment>right</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>LogLines</Label>
                         <Alignment>left</Alignment>
                     </TableColumnHeader>
                 </TableHeaders>
@@ -33,19 +29,27 @@
                     <TableRowEntry>
                         <TableColumnItems>
                             <TableColumnItem>
-                                <PropertyName>DateTime</PropertyName>
+                                <PropertyName>Name</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>User</PropertyName>
+                                <PropertyName>LogLevels</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>Domain</PropertyName>
+                                <PropertyName>WriteThrough</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>Severity</PropertyName>
-                            </TableColumnItem>
-                            <TableColumnItem>
-                                <PropertyName>Message</PropertyName>
+                                <ScriptBlock>
+                                    $loglineString = (
+                                        $_.Loglines |
+                                            Group-Object severity |
+                                            Select-Object Count, Name |
+                                            ForEach-Object -Process {
+                                                "$($_.count)x $($_.Name)"
+                                            }
+                                    ) -join "; "
+                                    if([string]::isNullOrEmpty($loglineString)){"-"}
+                                    else{$loglineString}
+                                </ScriptBlock>
                             </TableColumnItem>
                         </TableColumnItems>
                     </TableRowEntry>
