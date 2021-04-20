@@ -1,59 +1,33 @@
 function Get-LogContent(){
     [CmdletBinding(DefaultParameterSetName="__default")]
     param(
-        [Parameter(Mandatory=$true,ParameterSetName="Filter")]
+        [Parameter(ValueFromRemainingArguments=$true)]
         [string]
         $Filter,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(Mandatory=$true,ParameterSetName="First")]
         [int32]
+        [Parameter(ParameterSetName="First")]
         $First,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(Mandatory=$true,ParameterSetName="Last")]
         [int32]
+        [Parameter(ParameterSetName="Last")]
         $Last,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(ParameterSetName="First")]
-        [Parameter(ParameterSetName="Last")]
-        [Parameter(ParameterSetName="Severity")]
         [switch]
         $IncludeDebug,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(ParameterSetName="First")]
-        [Parameter(ParameterSetName="Last")]
-        [Parameter(ParameterSetName="Severity")]
         [switch]
         $IncludeVerbose,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(ParameterSetName="First")]
-        [Parameter(ParameterSetName="Last")]
-        [Parameter(ParameterSetName="Severity")]
         [switch]
         $IncludeInfo,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(ParameterSetName="First")]
-        [Parameter(ParameterSetName="Last")]
-        [Parameter(ParameterSetName="Severity")]
         [switch]
         $IncludeWarning,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(ParameterSetName="First")]
-        [Parameter(ParameterSetName="Last")]
-        [Parameter(ParameterSetName="Severity")]
         [switch]
         $IncludeSuccess,
 
-        [Parameter(ParameterSetName="Filter")]
-        [Parameter(ParameterSetName="First")]
-        [Parameter(ParameterSetName="Last")]
-        [Parameter(ParameterSetName="Severity")]
         [switch]
         $IncludeError
     )
@@ -75,7 +49,13 @@ function Get-LogContent(){
             }
         }
 
-        if($PsCmdlet.ParameterSetName -eq "Severity"){
+        if($PSBoundParameters.IncludeDebug -or 
+            $PSBoundParameters.IncludeVerbose -or 
+            $PSBoundParameters.IncludeInfo -or 
+            $PSBoundParameters.IncludeWarning -or 
+            $PSBoundParameters.IncludeSuccess -or 
+            $PSBoundParameters.IncludeError
+        ){
             $selectedSeverityLevels = @()
             if($PSBoundParameters.IncludeDebug){ $selectedSeverityLevels += "DEBUG" }
             if($PSBoundParameters.IncludeVerbose){ $selectedSeverityLevels += "VERBOSE" }
