@@ -63,7 +63,7 @@ function Get-LogContent(){
             if($PSBoundParameters.IncludeWarning){ $selectedSeverityLevels += "WARNING" }
             if($PSBoundParameters.IncludeSuccess){ $selectedSeverityLevels += "SUCCESS" }
             if($PSBoundParameters.IncludeError){ $selectedSeverityLevels += "ERROR" }
-            $selectedSeverityLevels
+
             $Lines = $Lines |Where-Object -FilterScript {
                 $_LogLine = $_
                 $_LogLine.Severity.Name -in $selectedSeverityLevels

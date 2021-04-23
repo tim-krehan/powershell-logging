@@ -48,7 +48,7 @@ New-ModuleManifest @manifestData
 
 Compress-Archive -Path "$export\$moduleName" -DestinationPath "$export\$moduleName.zip" -Force
 
-#Remove-Item -Path "$export\$moduleName" -Recurse -Force
+Remove-Item -Path "$export\$moduleName" -Recurse -Force
 
 # sign exported Module
 # $signingCertificate = Get-ChildItem cert:\CurrentUser\My -CodeSigningCert -DnsName "Tim Krehan"
