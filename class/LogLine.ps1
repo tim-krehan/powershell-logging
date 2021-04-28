@@ -57,6 +57,7 @@ Class LogLine{
         if(-not[string]::IsNullOrEmpty($env:USERDNSDOMAIN)){$this.Domain = $env:USERDNSDOMAIN.ToLower()}
         elseif(-not[string]::IsNullOrEmpty($env:COMPUTERNAME)){$this.Domain = $env:COMPUTERNAME.ToLower()}
         elseif(-not[string]::IsNullOrEmpty($env:NAME)){$this.Domain = $env:NAME.ToLower()}
+        else{$this.Domain = $(hostname).ToLower()}
         $this.Severity = [Severity]::new($severity)
         $this.Message = $message.trim()
     }
