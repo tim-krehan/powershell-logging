@@ -1,14 +1,18 @@
 function Open-Log(){
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName="__DEFAULT")]
     [Alias("Connect-Log")]
     param(
-        [parameter(Mandatory=$true,Position=0)]
+        [parameter(Mandatory=$true,Position=0,ParameterSetName="__DEFAULT")]
         [string]
         $Name,
     
-        [Parameter(Mandatory=$false,Position=1)]
+        [Parameter(Mandatory=$false,Position=1,ParameterSetName="__DEFAULT")]
         [String]
         $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop),
+    
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName="LOGFULLNAME")]
+        [System.IO.FileInfo]
+        $LogFullName,
     
         [switch]
         $ShowDebug,
@@ -47,7 +51,23 @@ function Open-Log(){
         if($ShowWarning){$LogLevel += "WARNING"}
         if($ShowSuccess){$LogLevel += "SUCCESS"}
         if($ShowError){$LogLevel += "ERROR"}
-        $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+        if($PsCmdlet.ParameterSetName -eq "LOGFULLNAME"){
+            $Script:LogConnection = [LogFile]::new($LogFullName, $LogLevel)
+        }
+        else{
+            $invalidCharIndex = $Name.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars())
+            if($invalidCharIndex -gt -1){
+                try{
+                    $Script:LogConnection = [LogFile]::new($Name, $LogLevel)
+                }
+                catch{
+                    throw "There is an invalid character `"$($Name[$invalidCharIndex])`" at position $invalidCharIndex of the logname `"$Name`""
+                }
+            }
+            else{
+                $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+            }
+        }
         $Script:LogConnection.WriteThrough = $WriteThrough
         return $Script:LogConnection
     }

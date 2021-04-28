@@ -94,7 +94,7 @@ Class LogFile{
             $this.LogLevels = $loglevel
             $this.Folder = (Get-Item $folder).FullName
             $this.Name = $name
-            $this.FullName = "{0}\{1}.log" -f $this.Folder, $name
+            $this.FullName = Join-Path -Path $this.Folder -ChildPath "$name.log"
             if(Test-Path -Path $this.FullName){
                 $this.Import()
             }
@@ -104,6 +104,23 @@ Class LogFile{
         }
         else{
             throw "folder '$folder' not existant"
+        }
+    }
+    LogFile($path, $loglevel){
+        $this.Folder = Split-Path -Path $path -Parent
+        if(Test-Path -Path $this.Folder){
+            $this.LogLevels = $loglevel
+            $this.Name = Split-Path -Path $path -Leaf
+            $this.FullName = $path
+            if(Test-Path -Path $this.FullName -PathType Leaf){
+                $this.Import()
+            }
+            else{
+                New-Item -Path $this.FullName -ItemType File
+            }
+        }
+        else{
+            throw "folder '$($this.Folder)' not existant"
         }
     }
     AddLine($severity, $message){
@@ -137,7 +154,8 @@ Class LogFile{
         }
     }
     Rename($newName){
-        if(-not(Test-Path -Path "$this.Folder\$newName")){
+        $newPath = Join-Path -Path $this.Folder -ChildPath $newName
+        if(-not(Test-Path -Path $newPath)){
             $dest = Rename-Item -Path $this.FullName -NewName "$newName.log" -PassThru
             $this.Name = $dest.Name
             $this.FullName = $dest.FullName
