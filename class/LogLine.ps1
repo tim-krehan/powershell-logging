@@ -52,8 +52,11 @@ Class LogLine{
 
     LogLine($severity, $message){
         $this.DateTime = Get-Date
-        $this.User = $env:USERNAME.ToLower()
-        $this.Domain = $env:USERDNSDOMAIN.ToLower()
+        if(-not[string]::IsNullOrEmpty($env:USERNAME)){$this.User = $env:USERNAME.ToLower()}
+        elseif(-not[string]::IsNullOrEmpty($env:USER)){$this.User = $env:USER.ToLower()}
+        if(-not[string]::IsNullOrEmpty($env:USERDNSDOMAIN)){$this.Domain = $env:USERDNSDOMAIN.ToLower()}
+        elseif(-not[string]::IsNullOrEmpty($env:COMPUTERNAME)){$this.Domain = $env:COMPUTERNAME.ToLower()}
+        elseif(-not[string]::IsNullOrEmpty($env:NAME)){$this.Domain = $env:NAME.ToLower()}
         $this.Severity = [Severity]::new($severity)
         $this.Message = $message.trim()
     }
