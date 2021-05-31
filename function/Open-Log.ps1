@@ -10,6 +10,11 @@ function Open-Log(){
         [String]
         $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop),
     
+        
+        [parameter(Mandatory=$false,Position=2,ParameterSetName="__DEFAULT")]
+        [SecureString]
+        $Password,
+    
         [Parameter(Mandatory=$true,Position=0,ParameterSetName="LOGFULLNAME")]
         [System.IO.FileInfo]
         $LogFullName,
@@ -58,14 +63,24 @@ function Open-Log(){
             $invalidCharIndex = $Name.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars())
             if($invalidCharIndex -gt -1){
                 try{
-                    $Script:LogConnection = [LogFile]::new($Name, $LogLevel)
+                    if($null -eq $Password){
+                        $Script:LogConnection = [LogFile]::new($Name, $LogLevel)
+                    }
+                    else{
+                        $Script:LogConnection = [LogFile]::new($Name, $LogLevel, $Password)
+                    }
                 }
                 catch{
                     throw "There is an invalid character `"$($Name[$invalidCharIndex])`" at position $invalidCharIndex of the logname `"$Name`""
                 }
             }
             else{
-                $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+                if($null -eq $Password){
+                    $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+                }
+                else{
+                    $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel, $Password)
+                }
             }
         }
         $Script:LogConnection.WriteThrough = $WriteThrough

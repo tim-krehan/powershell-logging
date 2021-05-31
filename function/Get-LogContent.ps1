@@ -38,6 +38,10 @@ function Get-LogContent(){
             throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
+        if($Script:LogConnection.isEncrypted){
+            throw "Use Unprotect-Log first, to edit this logfile!"
+            return
+        }
         $Lines = $Script:LogConnection.LogLines
 
         if(![string]::IsNullOrEmpty($PSBoundParameters.Filter)){
