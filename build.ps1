@@ -111,6 +111,10 @@ $fileOrder.Keys | ForEach-Object -Process {
                     AliasesToExport    = $metadata.aliasesToExport
                     ProjectUri         = 'https://github.com/tim-krehan/powershell-logging'
                     LicenseUri         = 'https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging/-/blob/master/LICENSE'
+                    PrivateData  = @{
+                        Tags         = $metaData.tags
+                        ReleaseNotes = $metaData.releasemessage
+                    }
                 }
                 Write-Host "Creating Manifest File"
                 New-ModuleManifest @manifestData
@@ -145,8 +149,12 @@ $fileOrder.Keys | ForEach-Object -Process {
                     Tags         = $metadata.tags
                     ReleaseNotes = $metadata.releasemessage
                     Copyright    = "Copyright ©$(Get-Date -Format "yyyy") $($metadata.author)"
-                    LicenseUri   = "https://dev.azure.com/baugruppe/DCProjects/_git/powershell-brztools?path=%2Flicense"
-                    ProjectUri   = "https://dev.azure.com/baugruppe/DCProjects/_git/powershell-brztools"
+                    ProjectUri   = 'https://github.com/tim-krehan/powershell-logging'
+                    LicenseUri   = 'https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging/-/blob/master/LICENSE'
+                    PrivateData  = @{
+                        Tags         = $metaData.tags
+                        ReleaseNotes = $metaData.releasemessage
+                    }
                 }
                 if ($metadata.dependencies.modules.Count -gt 0) {
                     $ScriptSplat.RequiredModules = @()
