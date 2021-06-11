@@ -11,9 +11,16 @@ function Write-Log(){
         # actual error text
         [Parameter(Mandatory=$true, Position=1, ValueFromRemainingArguments=$true)]
         [string]
-        $LogLine
+        $LogLine,
+        
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
     )
     begin{
+        if($null -ne $LogConnection){  
+            Switch-ActiveLog -LogConnection $LogConnection
+        }
     }
     process {
         if($null -eq $Script:LogConnection){
