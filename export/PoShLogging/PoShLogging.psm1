@@ -303,3 +303,394 @@ Class LogFile {
         return $hashKey
     }
 }
+function Clear-Log(){
+    [CmdletBinding(PositionalBinding=$false)]
+    param(
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
+    )
+    begin{
+    }
+    process {
+        if($null -eq $LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        if($LogConnection.isEncrypted){
+            throw "Use Unprotect-Log first, to edit this logfile!"
+            return
+        }
+        $LogConnection.Clear()
+    }
+    end{}
+}
+function Close-Log(){
+    [CmdletBinding()]
+    param(
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
+    )
+    begin{
+    }
+    process{
+        if($null -eq $Script:LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        $LogConnection.close()
+        Remove-Variable "LogConnection" -Scope "Script"
+    }
+    end{}
+}
+function Get-Log(){
+    [CmdletBinding()]
+    param(
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
+    )
+    begin{
+    }
+    process{
+        if($null -eq $LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        return $LogConnection
+    }
+    end{}
+}
+function Get-LogContent(){
+    [CmdletBinding(DefaultParameterSetName="__default")]
+    param(
+        [Parameter(ValueFromRemainingArguments=$true)]
+        [string]
+        $Filter,
+
+        [int32]
+        [Parameter(ParameterSetName="First")]
+        $First,
+
+        [int32]
+        [Parameter(ParameterSetName="Last")]
+        $Last,
+
+        [switch]
+        $IncludeDebug,
+
+        [switch]
+        $IncludeVerbose,
+
+        [switch]
+        $IncludeInfo,
+
+        [switch]
+        $IncludeWarning,
+
+        [switch]
+        $IncludeSuccess,
+
+        [switch]
+        $IncludeError,
+
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
+    )
+    begin{
+    }
+    process{
+        if($null -eq $LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        if($LogConnection.isEncrypted){
+            throw "Use Unprotect-Log first, to edit this logfile!"
+            return
+        }
+        $Lines = $LogConnection.LogLines
+
+        if(![string]::IsNullOrEmpty($PSBoundParameters.Filter)){
+            $Lines = $Lines |Where-Object -FilterScript {
+                $_LogLine = $_
+                $_LogLine.Domain -like $Filter -or
+                    $_LogLine.User -like $Filter -or
+                    $_LogLine.Message -like $Filter
+            }
+        }
+
+        if($PSBoundParameters.IncludeDebug -or 
+            $PSBoundParameters.IncludeVerbose -or 
+            $PSBoundParameters.IncludeInfo -or 
+            $PSBoundParameters.IncludeWarning -or 
+            $PSBoundParameters.IncludeSuccess -or 
+            $PSBoundParameters.IncludeError
+        ){
+            $selectedSeverityLevels = @()
+            if($PSBoundParameters.IncludeDebug){ $selectedSeverityLevels += "DEBUG" }
+            if($PSBoundParameters.IncludeVerbose){ $selectedSeverityLevels += "VERBOSE" }
+            if($PSBoundParameters.IncludeInfo){ $selectedSeverityLevels += "INFO" }
+            if($PSBoundParameters.IncludeWarning){ $selectedSeverityLevels += "WARNING" }
+            if($PSBoundParameters.IncludeSuccess){ $selectedSeverityLevels += "SUCCESS" }
+            if($PSBoundParameters.IncludeError){ $selectedSeverityLevels += "ERROR" }
+
+            $Lines = $Lines |Where-Object -FilterScript {
+                $_LogLine = $_
+                $_LogLine.Severity.Name -in $selectedSeverityLevels
+            }
+        }
+
+        if(![string]::IsNullOrEmpty($PSBoundParameters.First)){ $Lines = $Lines |Select-Object -First $First }
+        elseif(![string]::IsNullOrEmpty($PSBoundParameters.Last)){ $Lines = $Lines |Select-Object -Last $Last }
+
+        return $Lines
+    }
+    end{}
+}
+function Move-Log(){
+  [CMDLetBinding(PositionalBinding=$false)]
+  param(
+      # new directory
+      [Parameter(Mandatory=$true, Position=0)]
+      [string]
+      $Path,
+
+      [parameter()]
+      [LogFile]
+      $LogConnection = $Script:LogConnection
+  )
+  begin{
+  }
+  process {
+      if($null -eq $LogConnection){
+          throw "Use `"Open-Log`" first, to connect to a logfile!"
+          return
+      }
+      $LogConnection.Move($Path)
+  }
+  end{}
+}
+function Open-Log(){
+    [CmdletBinding(DefaultParameterSetName="__DEFAULT")]
+    [Alias("Connect-Log")]
+    param(
+        [parameter(Mandatory=$true,Position=0,ParameterSetName="__DEFAULT")]
+        [string]
+        $Name,
+    
+        [Parameter(Mandatory=$false,Position=1,ParameterSetName="__DEFAULT")]
+        [String]
+        $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop),
+    
+        
+        [parameter(Mandatory=$false,Position=2,ParameterSetName="__DEFAULT")]
+        [SecureString]
+        $Password,
+    
+        [Parameter(Mandatory=$true,Position=0,ParameterSetName="LOGFULLNAME")]
+        [System.IO.FileInfo]
+        $LogFullName,
+    
+        [switch]
+        $ShowDebug,
+
+        [switch]
+        $ShowVerbose,
+
+        [switch]
+        $ShowInfo,
+        
+        [switch]
+        $ShowWarning,
+        
+        [switch]
+        $ShowSuccess,
+        
+        [switch]
+        $ShowError,
+
+        [switch]
+        $WriteThrough
+    )
+    begin{
+        if([string]::isnullorempty($PSBoundParameters.ShowInfo)){ $ShowInfo = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowWarning)){ $ShowWarning = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowSuccess)){ $ShowSuccess = $true }
+        if([string]::isnullorempty($PSBoundParameters.ShowError)){ $ShowError = $true }
+        if([string]::isnullorempty($PSBoundParameters.WriteThrough)){ $WriteThrough = $true }
+    }
+    process{
+        # try{Close-Log}catch{}
+        $LogLevel = @()
+        if($ShowDebug){$LogLevel += "DEBUG"}
+        if($ShowVerbose){$LogLevel += "VERBOSE"}
+        if($ShowInfo){$LogLevel += "INFO"}
+        if($ShowWarning){$LogLevel += "WARNING"}
+        if($ShowSuccess){$LogLevel += "SUCCESS"}
+        if($ShowError){$LogLevel += "ERROR"}
+        if($PsCmdlet.ParameterSetName -eq "LOGFULLNAME"){
+            $Script:LogConnection = [LogFile]::new($LogFullName, $LogLevel)
+        }
+        else{
+            $invalidCharIndex = $Name.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars())
+            if($invalidCharIndex -gt -1){
+                try{
+                    if($null -eq $Password){
+                        $Script:LogConnection = [LogFile]::new($Name, $LogLevel)
+                    }
+                    else{
+                        $Script:LogConnection = [LogFile]::new($Name, $LogLevel, $Password)
+                    }
+                }
+                catch{
+                    throw "There is an invalid character `"$($Name[$invalidCharIndex])`" at position $invalidCharIndex of the logname `"$Name`""
+                }
+            }
+            else{
+                if($null -eq $Password){
+                    $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel)
+                }
+                else{
+                    $Script:LogConnection = [LogFile]::new($Name, $LogPath, $LogLevel, $Password)
+                }
+            }
+        }
+        $Script:LogConnection.WriteThrough = $WriteThrough
+        return $Script:LogConnection
+    }
+    end{}
+}
+function Protect-Log(){
+  [CmdletBinding()]
+  param(
+    [parameter(Mandatory=$true)]
+    [SecureString]$Password,
+
+    [parameter()]
+    [LogFile]
+    $LogConnection = $Script:LogConnection
+  )
+  begin{
+  }
+  process{
+      if($null -eq $LogConnection){
+          throw "Use `"Open-Log`" first, to connect to a logfile!"
+          return
+      }
+      $LogConnection.encrypt($Password)
+  }
+  end{}
+}
+function Rename-Log(){
+  [CMDLetBinding(PositionalBinding=$false)]
+  param(
+      # new directory
+      [Parameter(Mandatory=$true, Position=0)]
+      [string]
+      $NewName,
+
+      [parameter()]
+      [LogFile]
+      $LogConnection = $Script:LogConnection
+  )
+  begin{
+  }
+  process {
+      if($null -eq $LogConnection){
+          throw "Use `"Open-Log`" first, to connect to a logfile!"
+          return
+      }
+      $LogConnection.Rename($NewName)
+  }
+  end{}
+}
+function Save-Log(){
+    [CmdletBinding()]
+    param(
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
+    )
+    begin{
+    }
+    process{
+        if($null -eq $LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        if($LogConnection.isEncrypted){
+            throw "Use Unprotect-Log first, to edit this logfile!"
+            return
+        }
+        $LogConnection.SaveFile()
+    }
+    end{}
+}
+function Switch-Log(){
+  param(
+    [parameter(Mandatory=$true)]
+    [LogFile]$LogConnection
+  )
+  begin{}
+  process{
+    $Script:LogConnection = $LogConnection
+  }
+  end{}
+}
+function Unprotect-Log(){
+  [CmdletBinding()]
+  param(
+    [parameter(Mandatory=$true)]
+    [SecureString]$Password,
+
+    [parameter()]
+    [LogFile]
+    $LogConnection = $Script:LogConnection
+  )
+  begin{
+  }
+  process{
+      if($null -eq $LogConnection){
+          throw "Use `"Open-Log`" first, to connect to a logfile!"
+          return
+      }
+      $LogConnection.decrypt($Password)
+  }
+  end{}
+}
+function Write-Log(){
+    [CMDLetBinding(PositionalBinding=$false)]
+    [Alias("ulog")]
+    param(
+        # severity of logline
+        [Parameter(Mandatory=$true, Position=0)]
+        [ValidateSet("DEBUG", "VERBOSE", "INFO", "WARNING", "SUCCESS", "ERROR")]
+        [string]
+        $Severity,
+
+        # actual error text
+        [Parameter(Mandatory=$true, Position=1, ValueFromRemainingArguments=$true)]
+        [string]
+        $LogLine,
+        
+        [parameter()]
+        [LogFile]
+        $LogConnection = $Script:LogConnection
+    )
+    begin{
+    }
+    process {
+        if($null -eq $LogConnection){
+            throw "Use `"Open-Log`" first, to connect to a logfile!"
+            return
+        }
+        if($LogConnection.isEncrypted){
+            throw "Use Unprotect-Log first, to edit this logfile!"
+            return
+        }
+        $LogConnection.AddLine($Severity, $LogLine)
+    }
+    end{}
+}

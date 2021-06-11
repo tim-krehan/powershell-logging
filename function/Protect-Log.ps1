@@ -9,16 +9,13 @@ function Protect-Log(){
     $LogConnection = $Script:LogConnection
   )
   begin{
-    if($null -ne $LogConnection){  
-        Switch-ActiveLog -LogConnection $LogConnection
-    }
   }
   process{
-      if($null -eq $Script:LogConnection){
+      if($null -eq $LogConnection){
           throw "Use `"Open-Log`" first, to connect to a logfile!"
           return
       }
-      $Script:LogConnection.encrypt($Password)
+      $LogConnection.encrypt($Password)
   }
   end{}
 }
