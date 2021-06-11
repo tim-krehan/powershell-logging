@@ -2,7 +2,7 @@
 
 ## Installation
 
-1. download the latest release from [git-releases](https://github.com/tim-krehan/powershell-logging/releases)
+1. download the latest release from [git-releases](https://github.com/tim-krehan/powershell-logging/releases/latest)
 2. extract the files
 3. Open the Powershell in the extracted Folder
 4. Install the module with the following command:

@@ -1,3 +1,5 @@
-export/*.*
-!export/.gitkeep
+/build
+build.log
+Package.nuspec
+*.nupkg
 test.ps1
