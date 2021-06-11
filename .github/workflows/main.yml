@@ -1,12 +1,12 @@
-name: Build
+name: Publish to Gallery
 
 # Controls when the action will run. 
+
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ add-pipelines ]
-  # pull_request:
-  #   branches: [ main ]
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -23,10 +23,13 @@ jobs:
       # Runs a single command using the runners shell
       - name: execute build.ps1
         shell: pwsh
-        run: build.ps1
-
-      # # Runs a set of commands using the runners shell
-      # - name: Run a multi-line script
-      #   run: |
-      #     echo Add other actions to build,
-      #     echo test, and deploy your project.
+        run: ./build.ps1
+      
+      # publish to the PowerShell Gallery
+      - name: Publish PowerShell Module
+        uses: pcgeek86/publish-powershell-module-action@v19
+        with:
+          # The filesystem path to the module to import into the environment.
+          modulePath: ./build/modules/powershell-logging
+          # The NuGet API Key for PowerShell Gallery, with permission to push this module.
+          NuGetApiKey: ${{ secrets.POWERSHELLGALLERYAPIKEY }}
