@@ -109,7 +109,7 @@ $fileOrder.Keys | ForEach-Object -Process {
                     )
                     PowerShellVersion  = $metaData.powershellversion
                     AliasesToExport    = $metadata.aliasesToExport
-                    ProjectUri         = 'https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging'
+                    ProjectUri         = 'https://github.com/tim-krehan/powershell-logging'
                     LicenseUri         = 'https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging/-/blob/master/LICENSE'
                 }
                 Write-Host "Creating Manifest File"
@@ -175,29 +175,29 @@ $fileOrder.Keys | ForEach-Object -Process {
             }
         }
         #region create nuspec file
-        # Write-Host "##[section]Creating NuGet Specifications File"
-        # $nuspecContent = Get-Content "Package.nuspec.templ" -Raw
-        # Write-Host "Adding Type"
-        # $nuspecContent = $nuspecContent -replace "{{TYPE}}", $_type
-        # Write-Host "Adding Release Notes"
-        # $nuspecContent = $nuspecContent -replace "{{RELEASEMESSAGE}}", $metaData.releasemessage
-        # Write-Host "Adding Version"
-        # $nuspecContent = $nuspecContent -replace "{{VERSION}}", $metaData.version
-        # Write-Host "Adding Description"
-        # $nuspecContent = $nuspecContent -replace "{{DESCRIPTION}}", $metaData.description
-        # Write-Host "Adding Tags"
-        # $nuspecContent = $nuspecContent -replace "{{TAGS}}", ($metaData.tags -join " ")
-        # Write-Host "Adding Author"
-        # $nuspecContent = $nuspecContent -replace "{{AUTHOR}}", $metaData.author
-        # Write-Host "Adding Owner"
-        # $nuspecContent = $nuspecContent -replace "{{OWNER}}", $metaData.owner
-        # Write-Host "Adding Module Name"
-        # $nuspecContent = $nuspecContent -replace "{{MODULENAME}}", $_moduleName
-        # Write-Host "Adding Build Path"
-        # $nuspecContent = $nuspecContent -replace "{{MODULEPATHNAME}}", $_moduleName
-        # Write-Host "Creating nuspec file"
-        # $nuspecFile = New-Item -Path $targetDirectory -Name ("Package.$_type." + $_modulePath.BaseName + ".nuspec") -Value $nuspecContent -ItemType File
-        # Write-Host "`"$($nuspecFile.Name)`" created"
+        Write-Host "##[section]Creating NuGet Specifications File"
+        $nuspecContent = Get-Content "Package.nuspec.templ" -Raw
+        Write-Host "Adding Type"
+        $nuspecContent = $nuspecContent -replace "{{TYPE}}", $_type
+        Write-Host "Adding Release Notes"
+        $nuspecContent = $nuspecContent -replace "{{RELEASEMESSAGE}}", $metaData.releasemessage
+        Write-Host "Adding Version"
+        $nuspecContent = $nuspecContent -replace "{{VERSION}}", $metaData.version
+        Write-Host "Adding Description"
+        $nuspecContent = $nuspecContent -replace "{{DESCRIPTION}}", $metaData.description
+        Write-Host "Adding Tags"
+        $nuspecContent = $nuspecContent -replace "{{TAGS}}", ($metaData.tags -join " ")
+        Write-Host "Adding Author"
+        $nuspecContent = $nuspecContent -replace "{{AUTHOR}}", $metaData.author
+        Write-Host "Adding Owner"
+        $nuspecContent = $nuspecContent -replace "{{OWNER}}", $metaData.owner
+        Write-Host "Adding Module Name"
+        $nuspecContent = $nuspecContent -replace "{{MODULENAME}}", $_moduleName
+        Write-Host "Adding Build Path"
+        $nuspecContent = $nuspecContent -replace "{{MODULEPATHNAME}}", $_moduleName
+        Write-Host "Creating nuspec file"
+        $nuspecFile = New-Item -Path $targetDirectory -Name ("Package.$_type." + $_modulePath.BaseName + ".nuspec") -Value $nuspecContent -ItemType File
+        Write-Host "`"$($nuspecFile.Name)`" created"
         #endregion
     
         Write-Host "##[endgroup]module `"$_moduleName`" done"
