@@ -18,20 +18,17 @@ function Write-Log(){
         $LogConnection = $Script:LogConnection
     )
     begin{
-        if($null -ne $LogConnection){  
-            Switch-ActiveLog -LogConnection $LogConnection
-        }
     }
     process {
-        if($null -eq $Script:LogConnection){
+        if($null -eq $LogConnection){
             throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
-        if($Script:LogConnection.isEncrypted){
+        if($LogConnection.isEncrypted){
             throw "Use Unprotect-Log first, to edit this logfile!"
             return
         }
-        $Script:LogConnection.AddLine($Severity, $LogLine)
+        $LogConnection.AddLine($Severity, $LogLine)
     }
     end{}
 }

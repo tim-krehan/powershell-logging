@@ -1,4 +1,4 @@
-function Switch-ActiveLog(){
+function Switch-Log(){
   param(
     [parameter(Mandatory=$true)]
     [LogFile]$LogConnection
@@ -6,6 +6,7 @@ function Switch-ActiveLog(){
   begin{}
   process{
     $Script:LogConnection = $LogConnection
+    return $Script:LogConnection
   }
   end{}
 }

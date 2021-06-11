@@ -48,7 +48,7 @@ function Open-Log(){
         if([string]::isnullorempty($PSBoundParameters.WriteThrough)){ $WriteThrough = $true }
     }
     process{
-        try{Close-Log}catch{}
+        # try{Close-Log}catch{}
         $LogLevel = @()
         if($ShowDebug){$LogLevel += "DEBUG"}
         if($ShowVerbose){$LogLevel += "VERBOSE"}
