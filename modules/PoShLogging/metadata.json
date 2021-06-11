@@ -1,0 +1,22 @@
+{
+  "version": "2.1.1",
+  "releasemessage": "Initial release on Powershell gallery",
+  "owner": "timkrehan",
+  "author": "Tim Krehan",
+  "description": "Add simple Logging to Powershell to apply to your script!",
+  "aliasesToExport": [
+    "log",
+    "Connect-Log"
+  ],
+  "tags": [
+    "powershell",
+    "logging",
+    "poshlogging",
+    "simplelogging"
+  ],
+  "powershellversion": "5.1",
+  "dependencies": {
+    "modules": [],
+    "assemblies": []
+  }
+}
