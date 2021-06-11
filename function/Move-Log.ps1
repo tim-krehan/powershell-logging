@@ -4,9 +4,16 @@ function Move-Log(){
       # new directory
       [Parameter(Mandatory=$true, Position=0)]
       [string]
-      $Path
+      $Path,
+
+      [parameter()]
+      [LogFile]
+      $LogConnection = $Script:LogConnection
   )
   begin{
+    if($null -ne $LogConnection){  
+        Switch-ActiveLog -LogConnection $LogConnection
+    }
   }
   process {
       if($null -eq $Script:LogConnection){
