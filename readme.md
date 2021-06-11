@@ -1,5 +1,7 @@
 # Add easy logging to PowerShell
 
+[![Build](https://github.com/tim-krehan/powershell-logging/actions/workflows/main.yml/badge.svg)](https://github.com/tim-krehan/powershell-logging/actions/workflows/main.yml)
+
 ## Installation
 
 1. download the latest release from [git-releases](https://github.com/tim-krehan/powershell-logging/releases/latest)
