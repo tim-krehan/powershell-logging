@@ -9,27 +9,27 @@ function Add-LogTarget() {
     [Switch]
     $Console,
     
-    [Parameter(Mandatory=$true,ParameterSetName = "console")]
+    [Parameter(Mandatory=$false,ParameterSetName = "console")]
     [switch]
     $ShowDebug,
 
-    [Parameter(Mandatory=$true,ParameterSetName = "console")]
+    [Parameter(Mandatory=$false,ParameterSetName = "console")]
     [switch]
     $ShowVerbose,
 
-    [Parameter(Mandatory=$true,ParameterSetName = "console")]
+    [Parameter(Mandatory=$false,ParameterSetName = "console")]
     [switch]
     $ShowInfo,
     
-    [Parameter(Mandatory=$true,ParameterSetName = "console")]
+    [Parameter(Mandatory=$false,ParameterSetName = "console")]
     [switch]
     $ShowWarning,
     
-    [Parameter(Mandatory=$true,ParameterSetName = "console")]
+    [Parameter(Mandatory=$false,ParameterSetName = "console")]
     [switch]
     $ShowSuccess,
     
-    [Parameter(Mandatory=$true,ParameterSetName = "console")]
+    [Parameter(Mandatory=$false,ParameterSetName = "console")]
     [switch]
     $ShowError,
 
