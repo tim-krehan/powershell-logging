@@ -24,10 +24,6 @@ function Write-Log(){
             throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
-        if($LogConnection.isEncrypted){
-            throw "Use Unprotect-Log first, to edit this logfile!"
-            return
-        }
         $LogConnection.AddLine($Severity, $LogLine)
     }
     end{}
