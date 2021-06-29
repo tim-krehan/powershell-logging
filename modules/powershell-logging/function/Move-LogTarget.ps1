@@ -1,9 +1,13 @@
-function Remove-LogTarget() {
+function Move-LogTarget() {
   [CMDLetBinding(PositionalBinding = $false)]
   param(
     [Parameter(Mandatory = $true, Position = 0)]
     [string]
     $GUID,
+        
+    [Parameter(Mandatory = $true, Position = 0)]
+    [string]
+    $Path,
 
     [parameter()]
     [LogFile]
@@ -17,7 +21,8 @@ function Remove-LogTarget() {
       throw "Use `"Open-Log`" first, to connect to a logfile!"
       return
     }
-    $LogConnection.RemoveTarget($GUID)
+    $target = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
+    $target.Move($Path)
     if($updateScriptConnection){$Script:LogConnection = $LogConnection}
   }
   end {}
