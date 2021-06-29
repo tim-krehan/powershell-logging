@@ -1,10 +1,15 @@
-function Clear-Log(){
-    [CmdletBinding(PositionalBinding=$false)]
+function Clear-LogTarget(){
+    [CmdletBinding(PositionalBinding=$false, DefaultParameterSetName="GUID")]
     param(
+        [Parameter(ParameterSetName="GUID",ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
         [GUID]
-        $GUID = ($Script:LogConnection.Targets |Where-Object Type -EQ File |Select-Object -First 1 -ExpandProperty GUID),
+        $GUID,
         
-        [parameter()]
+        [Parameter(ParameterSetName="pipeline",ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
+        [LogTarget[]]
+        $Targets,
+        
+        [parameter(ValueFromPipeline = $false)]
         [LogFile]
         $LogConnection = $Script:LogConnection
     )
@@ -15,8 +20,12 @@ function Clear-Log(){
             throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
-        $target = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
-        $target.Clear()
+        
+        if($PsCmdlet.ParameterSetName -eq "GUID"){
+            $Targets = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
+        }
+        $Targets |ForEach-Object -Process {$_.Clear()}
+        
     }
     end{}
 }

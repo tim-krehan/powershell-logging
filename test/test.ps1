@@ -41,7 +41,7 @@ Write-Log ERROR   "write ERROR to only the second logfile"
 Add-LogTarget -Console
 Close-Log -LogConnection $log
 
-# Open new Stream Only Log
+# # Open new Stream Only Log
 Open-Log -Name StreamLogging -ConsoleType Stream -ShowDebug -ShowVerbose
 
 Write-Log DEBUG   "write DEBUG to stream" -Debug
@@ -50,3 +50,15 @@ Write-Log INFO    "write INFO to stream" -InformationAction Continue
 Write-Log SUCCESS "write SUCCESS to stream"
 Write-Log WARNING "write WARNING to stream"
 Write-Log ERROR   "write ERROR to stream"
+
+# Open log from pipeline
+Get-ChildItem "$workingDir\PowerShell2.log" |Open-Log
+Get-ChildItem "$workingDir\PowerShell.log" |Add-LogTarget
+
+# Clear all log targets from  Pipeline
+#Get-Log |Select-Object -ExpandProperty Targets |Where-Object -Property Type -EQ File |Clear-LogTarget
+Get-Log |select -exp targets
+
+
+Get-Log |select -exp targets |? type -eq file |? {$_.fileinformation.name -like "powershell.log"} |Rename-LogTarget -NewName powershell3.log
+Get-ChildItem "$workingDir\PowerShell3.log" |Add-LogTarget

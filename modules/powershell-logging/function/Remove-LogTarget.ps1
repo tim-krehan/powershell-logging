@@ -1,7 +1,7 @@
 function Remove-LogTarget() {
-  [CMDLetBinding(PositionalBinding = $false)]
+  [CmdletBinding(PositionalBinding=$false)]
   param(
-    [Parameter(Mandatory = $true, Position = 0)]
+    [Parameter(ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
     [GUID]
     $GUID,
 
@@ -16,7 +16,8 @@ function Remove-LogTarget() {
       throw "Use `"Open-Log`" first, to connect to a logfile!"
       return
     }
-    $LogConnection.RemoveTarget($GUID)
+    $Target = $LogConnection.Targets | Where-Object -Property GUID -EQ $GUID
+    $LogConnection.RemoveTarget($Target.GUID)
   }
   end {}
 }

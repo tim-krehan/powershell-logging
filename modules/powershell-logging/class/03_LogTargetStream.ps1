@@ -1,7 +1,4 @@
 Class LogTargetStream : LogTarget {
-  [string]$GUID
-  [LogTargetType]$Type
-  [bool]$active = $true
   [Severity[]]$severitiesToDisplay
   LogTargetStream($severitiesToDisplay) : base([LogTargetType]::Console) {
     $this.severitiesToDisplay = $severitiesToDisplay

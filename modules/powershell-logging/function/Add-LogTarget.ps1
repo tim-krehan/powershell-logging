@@ -1,9 +1,14 @@
 function Add-LogTarget() {
   [CMDLetBinding(PositionalBinding = $false, DefaultParameterSetName = "file")]
   param(
-    [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "file")]
+    [Parameter(Mandatory = $true, Position = 0, ParameterSetName = "file", ValueFromPipelineByPropertyName = $true)]
     [string]
     $FullName,
+
+    [Parameter(Mandatory = $false)]
+    [ValidateSet("Host", "Stream", "None")]
+    [string]
+    $ConsoleType = "Host",
 
     [Parameter(Mandatory = $true, ParameterSetName = "console")]
     [Switch]
@@ -66,9 +71,23 @@ function Add-LogTarget() {
         if ($ShowWarning) { $LogLevel += "WARNING" }
         if ($ShowSuccess) { $LogLevel += "SUCCESS" }
         if ($ShowError) { $LogLevel += "ERROR" }
-        $consoleTarget = $LogConnection.AddTarget([LogTargetType]::Console, [ordered]@{
-            severitiesToDisplay = [Severity[]]$LogLevel
-          })
+        switch ($ConsoleType) {
+          "Host" {
+            $consoleTarget = $LogConnection.AddTarget([LogTargetType]::Console, [ordered]@{
+                severitiesToDisplay = [Severity[]]$LogLevel
+              })
+            break
+          }
+          "Stream" {
+            $consoleTarget = $LogConnection.AddTarget([LogTargetType]::Stream, [ordered]@{
+                severitiesToDisplay = [Severity[]]$LogLevel
+              })
+            break
+          }
+          default {
+            # add no console target
+          }
+        }
         break;
       }
     }

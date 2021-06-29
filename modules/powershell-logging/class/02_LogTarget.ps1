@@ -8,15 +8,15 @@ Class LogTarget {
   }
 
   Disable(){
-    $this.active = $false
+    $this.Active = $false
   }
 
   Enable(){
-    $this.active = $true
+    $this.Active = $true
   }
 
   hidden checkState(){
-    if(!$this.active){
+    if(!$this.Active){
       throw "the target `"$($this.GUID)`" is inactive, please enable it to use it again!"
     }
   }

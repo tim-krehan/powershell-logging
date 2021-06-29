@@ -2,12 +2,12 @@ function Open-Log(){
     [CmdletBinding()]
     [Alias("Connect-Log")]
     param(
-        [parameter(Mandatory=$true,Position=0)]
+        [parameter(Mandatory=$true,Position=0,ValueFromPipelineByPropertyName=$true)]
         [string]
         $Name,
     
-        [Parameter(ParameterSetName="file")]
-        [Alias("FullName")]
+        [Parameter(ParameterSetName="file",ValueFromPipelineByPropertyName=$true)]
+        [Alias("DirectoryName")]
         [String]
         $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop),
 

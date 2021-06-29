@@ -1,8 +1,12 @@
 function Rename-LogTarget() {
-  [CMDLetBinding(PositionalBinding = $false)]
+  [CmdletBinding(PositionalBinding=$false, DefaultParameterSetName="GUID")]
   param(
-    [Parameter(Mandatory = $true, Position = 0)]
+    [Parameter(ParameterSetName = "GUID", ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
     [GUID]$GUID,
+
+    [Parameter(ParameterSetName = "pipeline", ValueFromPipelineByPropertyName = $true)]
+    [LogTarget]
+    $Targets,
 
     [Parameter(Mandatory = $true, Position = 1)]
     [string]
@@ -19,8 +23,10 @@ function Rename-LogTarget() {
       throw "Use `"Open-Log`" first, to connect to a logfile!"
       return
     }
-    $target = $LogConnection.Targets | Where-Object -Property GUID -EQ $GUID
-    $target.Rename($NewName)
+    if($PsCmdlet.ParameterSetName -eq "GUID"){
+      $Targets = $LogConnection.Targets | Where-Object -Property GUID -EQ $GUID
+    }
+    $Targets |ForEach-Object -Process {$_.Rename($NewName)}
   }
   end {}
 }

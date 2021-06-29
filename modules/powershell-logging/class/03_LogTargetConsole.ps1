@@ -1,7 +1,4 @@
 Class LogTargetConsole : LogTarget {
-  [string]$GUID
-  [LogTargetType]$Type
-  [bool]$active = $true
   [Severity[]]$severitiesToDisplay
   LogTargetConsole($severitiesToDisplay) : base([LogTargetType]::Console) {
     $this.severitiesToDisplay = $severitiesToDisplay

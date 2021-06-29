@@ -1,9 +1,13 @@
 function Enable-LogTarget() {
-  [CMDLetBinding(PositionalBinding = $false)]
+  [CmdletBinding(PositionalBinding=$false, DefaultParameterSetName="GUID")]
   param(
-    [Parameter(Mandatory = $true, Position = 0)]
-    [string]
+    [Parameter(ParameterSetName = "GUID", ValueFromPipelineByPropertyName = $true, Mandatory = $true)]
+    [GUID]
     $GUID,
+
+    [Parameter(ParameterSetName = "pipeline", ValueFromPipelineByPropertyName = $true)]
+    [LogTarget[]]
+    $Targets,
 
     [parameter()]
     [LogFile]
@@ -17,8 +21,10 @@ function Enable-LogTarget() {
       return
     }
 
-    $target = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
-    $target.Enable()
+    if($PsCmdlet.ParameterSetName -eq "GUID"){
+      $Targets = $LogConnection.Targets | Where-Object -Property GUID -EQ $GUID
+    }
+    $Targets |ForEach-Object -Process {$_.Enable()}
   }
   end {}
 }

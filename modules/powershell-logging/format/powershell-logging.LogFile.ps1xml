@@ -10,14 +10,14 @@
                 <TableHeaders>
                     <TableColumnHeader>
                         <Label>Name</Label>
+                        <Alignment>left</Alignment>
+                    </TableColumnHeader>
+                    <TableColumnHeader>
+                        <Label>Active</Label>
                         <Alignment>right</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
-                        <Label>LogLevels</Label>
-                        <Alignment>right</Alignment>
-                    </TableColumnHeader>
-                    <TableColumnHeader>
-                        <Label>WriteThrough</Label>
+                        <Label>Targets</Label>
                         <Alignment>right</Alignment>
                     </TableColumnHeader>
                     <TableColumnHeader>
@@ -32,10 +32,12 @@
                                 <PropertyName>Name</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>LogLevels</PropertyName>
+                                <PropertyName>Active</PropertyName>
                             </TableColumnItem>
                             <TableColumnItem>
-                                <PropertyName>WriteThrough</PropertyName>
+                                <ScriptBlock>
+                                    $_.targets.Type
+                                </ScriptBlock>
                             </TableColumnItem>
                             <TableColumnItem>
                                 <ScriptBlock>

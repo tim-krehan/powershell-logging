@@ -14,7 +14,7 @@ Class LogFile {
     $this.Targets += $newTaget
     if ($newTaget | Get-Member -MemberType Method -Name Get) {
       $this.LogLines += $newTaget.Get()
-      $this.LogLines = $this.LogLines | Sort-Object -Property DateTime
+      $this.LogLines = $this.LogLines | Sort-Object -Property DateTime -Unique
     }
     return $newTaget
   }
@@ -25,7 +25,7 @@ Class LogFile {
   }
 
   AddLine($severity, $message) {
-    if (!$this.active) { throw "Log '$($this.Name)' is inactive! Open it again to use it." }
+    if (!$this.Active) { throw "Log '$($this.Name)' is inactive! Open it again to use it." }
     $logline = [LogLine]::new($severity, $message)
     $this.LogLines += $logline
     $this.Targets |Where-Object -Property Active -EQ -Value $true | ForEach-Object -Process {
