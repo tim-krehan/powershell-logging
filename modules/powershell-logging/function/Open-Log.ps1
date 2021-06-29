@@ -10,6 +10,11 @@ function Open-Log(){
         [Alias("FullName")]
         [String]
         $LogPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop),
+
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("Host", "Stream", "None")]
+        [string]
+        $ConsoleType = "Host",
     
         [switch]
         $ShowDebug,
@@ -46,13 +51,28 @@ function Open-Log(){
         if($ShowError){$LogLevel += "ERROR"}
         $Script:LogConnection = [LogFile]::new($Name)
 
-        $Script:LogConnection.AddTarget([LogTargetType]::Console, [ordered]@{
-            severitiesToDisplay = [Severity[]]$LogLevel
-        })
+        switch($ConsoleType){
+            "Host" {
+                $consoleTarget = $Script:LogConnection.AddTarget([LogTargetType]::Console, [ordered]@{
+                    severitiesToDisplay = [Severity[]]$LogLevel
+                })
+                break
+            }
+            "Stream" {
+                $consoleTarget = $Script:LogConnection.AddTarget([LogTargetType]::Stream, [ordered]@{
+                    severitiesToDisplay = [Severity[]]$LogLevel
+                })
+                break
+            }
+            default {
+                # add no console target
+            }
+        }
+
 
         if($PsCmdlet.ParameterSetName -eq "file"){
             if(-not($Name -like "*.log")){$Name += ".log"}
-            $Script:LogConnection.AddTarget([LogTargetType]::File, [ordered]@{
+            $fileTarget = $Script:LogConnection.AddTarget([LogTargetType]::File, [ordered]@{
                 filePath = (Join-Path -Path $LogPath -ChildPath $Name)
             })
         }

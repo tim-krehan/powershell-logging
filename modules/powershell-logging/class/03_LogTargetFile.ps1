@@ -10,6 +10,7 @@ Class LogTargetFile : LogTarget {
   }
 
   Set([LogLine[]]$logLines) {
+    $this.checkState()
     $newContent = $logLines | ForEach-Object -Process { $_.ToString() }
     $joinedContent = $newContent -join [Environment]::NewLine
     try {
@@ -21,6 +22,7 @@ Class LogTargetFile : LogTarget {
   }
 
   [LogLine[]] Get() {
+    $this.checkState()
     $availableContent = (Get-Content -Encoding UTF8 -Path $this.fileInformation.FullName) -split [Environment]::NewLine
     $returnedLines = @()
     foreach ($line in $availableContent) {
@@ -31,7 +33,14 @@ Class LogTargetFile : LogTarget {
     return $returnedLines
   }
 
+  Rename($newName) {
+    $this.checkState()
+    $dest = Rename-Item -Path $this.fileInformation.FullName -NewName $newName -PassThru
+    $this.fileInformation = $dest
+  }
+
   Move($newLocation) {
+    $this.checkState()
     if (Test-Path -Path $newLocation) {
       $newLocationItem = Get-Item -Path $newLocation
       if ($newLocationItem -is [System.IO.DirectoryInfo]) {
@@ -47,8 +56,7 @@ Class LogTargetFile : LogTarget {
     }
   }
 
-  Rename($newName) {
-    $dest = Rename-Item -Path $this.fileInformation.FullName -NewName $newName -PassThru
-    $this.fileInformation = $dest
+  Clear() {
+    New-Item -Path $this.fileInformation.FullName -ItemType File -Force
   }
 }

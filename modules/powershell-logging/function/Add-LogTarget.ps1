@@ -44,15 +44,13 @@ function Add-LogTarget() {
     if ([string]::isnullorempty($PSBoundParameters.ShowError)) { $ShowError = $true }
   }
   process {
-    if($LogConnection -eq $Script:LogConnection){$updateScriptConnection = $true}
     if ($null -eq $LogConnection) {
       throw "Use `"Open-Log`" first, to connect to a logfile!"
       return
     }
-    [LogTarget]$target = $null
     switch ($PsCmdlet.ParameterSetName) {
       "file" {
-        $LogConnection.AddTarget([LogTargetType]::File, [ordered]@{
+        $fileTarget = $LogConnection.AddTarget([LogTargetType]::File, [ordered]@{
             filePath = $FullName
           })
         break;
@@ -68,15 +66,14 @@ function Add-LogTarget() {
         if ($ShowWarning) { $LogLevel += "WARNING" }
         if ($ShowSuccess) { $LogLevel += "SUCCESS" }
         if ($ShowError) { $LogLevel += "ERROR" }
-        $LogConnection.AddTarget([LogTargetType]::Console, [ordered]@{
+        $consoleTarget = $LogConnection.AddTarget([LogTargetType]::Console, [ordered]@{
             severitiesToDisplay = [Severity[]]$LogLevel
           })
         break;
       }
     }
 
-    if($updateScriptConnection){$Script:LogConnection = $LogConnection}
-    return $target
+    return $LogConnection
   }
   end {}
 }

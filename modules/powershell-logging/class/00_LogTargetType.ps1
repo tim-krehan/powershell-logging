@@ -1,6 +1,6 @@
 Enum LogTargetType{
   File
   Console
-  System
+  Stream
   None
 }

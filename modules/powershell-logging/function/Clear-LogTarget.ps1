@@ -2,7 +2,7 @@ function Clear-Log(){
     [CmdletBinding(PositionalBinding=$false)]
     param(
         [GUID]
-        $LogTartet = ($Script:LogConnection.Targets |Where-Object Type -EQ File |Select-Object -First 1 -ExpandProperty GUID),
+        $GUID = ($Script:LogConnection.Targets |Where-Object Type -EQ File |Select-Object -First 1 -ExpandProperty GUID),
         
         [parameter()]
         [LogFile]

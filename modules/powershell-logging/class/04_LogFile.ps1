@@ -19,8 +19,8 @@ Class LogFile {
     return $newTaget
   }
 
-  RemoveTarget($GUID) {
-    $newTargets = $this.Targets | Where-Object -Property GUID -NE $GUID
+  RemoveTarget([GUID]$GUID) {
+    $newTargets = $this.Targets | Where-Object -Property GUID -NE $GUID.Guid
     $this.Targets = $newTargets
   }
 
@@ -28,17 +28,11 @@ Class LogFile {
     if (!$this.active) { throw "Log '$($this.Name)' is inactive! Open it again to use it." }
     $logline = [LogLine]::new($severity, $message)
     $this.LogLines += $logline
-    $this.Targets | ForEach-Object -Process {
+    $this.Targets |Where-Object -Property Active -EQ -Value $true | ForEach-Object -Process {
       if ($null -eq $_) { continue }
       $_.Set($logline);
     }
   }
-
-  # Clear() {
-  #     if (!$this.active) { throw "Log '$($this.Name)' is inactive! Open it again to use it." }
-  #     $this.LogLines = @()
-  #     New-Item -Path $this.FullName -ItemType File -Force
-  # }
 
   Close() {
     if (!$this.active) { throw "Log '$($this.Name)' is inactive! Open it again to use it." }

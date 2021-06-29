@@ -1,7 +1,7 @@
 Class LogTarget {
   [string]$GUID
   [LogTargetType]$Type
-  [bool]$active = $true
+  [bool]$Active = $true
   LogTarget([LogTargetType]$type) {
     $this.GUID = [GUID]::NewGuid().GUID.ToUpper()
     $this.Type = $type
@@ -13,6 +13,12 @@ Class LogTarget {
 
   Enable(){
     $this.active = $true
+  }
+
+  hidden checkState(){
+    if(!$this.active){
+      throw "the target `"$($this.GUID)`" is inactive, please enable it to use it again!"
+    }
   }
 
   Set([LogLine[]]$logLines) {

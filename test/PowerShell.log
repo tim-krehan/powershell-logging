@@ -1,5 +1,0 @@
-﻿2021-06-29 08:18:43.3500 - b550@baugruppe.de -   DEBUG - write DEBUG within the current working directory
-2021-06-29 08:18:43.3601 - b550@baugruppe.de - VERBOSE - write VERBOSE within the current working directory
-2021-06-29 08:18:43.3650 - b550@baugruppe.de -    INFO - write INFO within the current working directory
-2021-06-29 08:18:43.3710 - b550@baugruppe.de - WARNING - write WARNING within the current working directory
-2021-06-29 08:18:43.3759 - b550@baugruppe.de -   ERROR - write ERROR within the current working directory

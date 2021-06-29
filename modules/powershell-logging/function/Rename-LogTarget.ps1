@@ -1,13 +1,12 @@
-function Move-LogTarget() {
+function Rename-LogTarget() {
   [CMDLetBinding(PositionalBinding = $false)]
   param(
     [Parameter(Mandatory = $true, Position = 0)]
+    [GUID]$GUID,
+
+    [Parameter(Mandatory = $true, Position = 1)]
     [string]
-    $GUID,
-        
-    [Parameter(Mandatory = $true, Position = 0)]
-    [string]
-    $Path,
+    $NewName,
 
     [parameter()]
     [LogFile]
@@ -20,8 +19,8 @@ function Move-LogTarget() {
       throw "Use `"Open-Log`" first, to connect to a logfile!"
       return
     }
-    $target = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
-    $target.Move($Path)
+    $target = $LogConnection.Targets | Where-Object -Property GUID -EQ $GUID
+    $target.Rename($NewName)
   }
   end {}
 }
