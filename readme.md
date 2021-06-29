@@ -15,16 +15,20 @@ Install-Module -Name powershell-logging -Repository PSGallery -Scope CurrentUser
 ### Open-Log
 
 ``` powershell
-# Open (or switch to) a new log file.
+# Open (or switch to) a new log file with console and file target.
 $LogConnection = Open-Log -Name "PowershellLogging" -LogPath ".\LOG"
-# Open a encrypted log file with given password and decrypt it
-$LogConnection = Open-Log "C:\Log\PowershellLogging.log" -Password (Read-Host -AsSecureString)
+# Open an existing logfile
+$LogConnection = Get-ChildItem ".\Log\PowershellLogging.log" | Open-Log
+# Open a log, that writes exclusivly to the console
+Open-Log -Name "PowershellLogging"
+# Open a log, that uses the Powershell Streams to write the corresponding messages to
+Open-Log -Name "PowershellLogging" -ConsoleType "Stream"
 ```
 
 ``` txt
- Name                                    LogLevels WriteThrough LogLines
- ----                                    --------- ------------ --------
- PowershellLogging {INFO, WARNING, SUCCESS, ERROR}         True -
+ Name            Active                Targets LogLines
+ ----            ------                ------- --------
+ PowerShell.log    True        {Console, File} -
 ```
 
 ### Write-Log
@@ -61,15 +65,6 @@ Get-Log
 Close-Log
 # closes the given log connection
 Close-Log -LogConnection $LogConnection
-```
-
-### Clear-Log
-
-``` powershell
-# empties the current log file completly
-Clear-Log
-# empties the given log file completly
-Clear-Log -LogConnection $LogConnection
 ```
 
 ### Get-LogContent
@@ -113,22 +108,54 @@ DateTime            User Domain    Severity Message
 11.06.2021 08:37:19  tim krehan.de     INFO web server (iis) has exited
 ```
 
-### Move-Log
+### Add-LogTarget
 
 ``` powershell
-# Moves the current active log file to the specified destination
-Move-Log -Path "C:\Log"
-# Moves the given log file to the specified destination
-Move-Log -Path "C:\Log" -LogConnection $LogConnection
+# Add Another Target to the currently opened log
+Add-LogTarget -FullName ".\LOG\PowershellLogging2.log"
 ```
 
-### Rename-Log
+```txt
+ Name       Active               Targets LogLines
+ ----       ------               ------- --------
+ PowerShell   True {Console, File, File} -
+```
+
+### Remove-LogTarget
 
 ``` powershell
-# Renames the current active log
-Rename-Log -NewName "iis"
-# Renames the given log file
-Rename-Log -NewName "powershell" -LogConnection $LogConnection
+# Removes the second LogTarget
+Remove-LogTarget -GUID ((Get-Log).Targets[1].GUID)
+# Removes all LogTargets
+Get-Log |Select-Object -ExpandProperty Targets | Remove-LogTarget
+```
+
+### Clear-LogTarget
+
+``` powershell
+# Clears the second LogTarget
+Clear-LogTarget -GUID ((Get-Log).Targets[1].GUID)
+# Clears all LogTargets
+Get-Log |Select-Object -ExpandProperty Targets | Clear-LogTarget
+# a target of type Console will delete all scrolling history, a file type will remove all file content.
+```
+
+### Move-LogTarget
+
+``` powershell
+# Moves the target to the specified destination
+Move-LogTarget -Path "C:\Log" -GUID "F421DC01-0275-4EB8-BE78-7D9E4966E999"
+# Moves the given log file to the specified destination
+(Get-Log).Targets |where-object Type -like File |Foreach-Object -Process {
+    Move-LogTarget -Target $_ -Path ".\LOG2"
+}
+```
+
+### Rename-LogTarget
+
+``` powershell
+# Renames the target
+Rename-LogTarget -NewName "powershell" -GUID "F421DC01-0275-4EB8-BE78-7D9E4966E999"
 ```
 
 ### Switch-Log
@@ -142,25 +169,4 @@ Switch-Log -LogConnection $LogConnection
      Name                       LogLevels WriteThrough LogLines
      ----                       --------- ------------ --------
  log2.log {INFO, WARNING, SUCCESS, ERROR}         True 12x INFO; 3x ERROR
-```
-
-### Protect-Log
-
-``` powershell
-# Encrypts the current active log
-Protect-Log -Password (Read-Host -AsSecureString)
-```
-
-### Unprotect-Log
-
-``` powershell
-# Decrypts the given log
-Unprotect-Log -Password (Read-Host -AsSecureString) -LogConnection $LogConnection
-```
-
-### Save-Log
-
-``` powershell
-# Saves all unsaved changes in the current active log file
-Save-Log
 ```
