@@ -41,7 +41,7 @@ Write-Log ERROR   "write ERROR to only the second logfile"
 Add-LogTarget -Console
 Close-Log -LogConnection $log
 
-# # Open new Stream Only Log
+# Open new Stream Only Log
 Open-Log -Name StreamLogging -ConsoleType Stream -ShowDebug -ShowVerbose
 
 Write-Log DEBUG   "write DEBUG to stream" -Debug
