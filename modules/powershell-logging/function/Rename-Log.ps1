@@ -1,8 +1,10 @@
-function Rename-Log(){
+function Rename-LogTarget(){
   [CMDLetBinding(PositionalBinding=$false)]
   param(
-      # new directory
       [Parameter(Mandatory=$true, Position=0)]
+      [GUID]$GUID,
+
+      [Parameter(Mandatory=$true, Position=1)]
       [string]
       $NewName,
 
@@ -17,7 +19,8 @@ function Rename-Log(){
           throw "Use `"Open-Log`" first, to connect to a logfile!"
           return
       }
-      $LogConnection.Rename($NewName)
+      $target = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
+      $target.Rename($NewName)
   }
   end{}
 }

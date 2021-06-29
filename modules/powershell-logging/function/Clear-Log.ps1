@@ -1,6 +1,9 @@
 function Clear-Log(){
     [CmdletBinding(PositionalBinding=$false)]
     param(
+        [GUID]
+        $LogTartet = ($Script:LogConnection.Targets |Where-Object Type -EQ File |Select-Object -First 1 -ExpandProperty GUID),
+        
         [parameter()]
         [LogFile]
         $LogConnection = $Script:LogConnection
@@ -12,11 +15,8 @@ function Clear-Log(){
             throw "Use `"Open-Log`" first, to connect to a logfile!"
             return
         }
-        if($LogConnection.isEncrypted){
-            throw "Use Unprotect-Log first, to edit this logfile!"
-            return
-        }
-        $LogConnection.Clear()
+        $target = $LogConnection.Targets |Where-Object -Property GUID -EQ $GUID
+        $target.Clear()
     }
     end{}
 }

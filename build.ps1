@@ -150,7 +150,7 @@ $fileOrder.Keys | ForEach-Object -Process {
                     ReleaseNotes = $metadata.releasemessage
                     Copyright    = "Copyright ©$(Get-Date -Format "yyyy") $($metadata.author)"
                     ProjectUri   = 'https://github.com/tim-krehan/powershell-logging'
-                    LicenseUri   = 'https://github.com/tim-krehan/powershell-logging/tree/main/export/PoShLogging/-/blob/master/LICENSE'
+                    LicenseUri   = 'https://github.com/tim-krehan/powershell-logging/blob/main/LICENSE'
                     PrivateData  = @{
                         Tags         = $metaData.tags
                         ReleaseNotes = $metaData.releasemessage

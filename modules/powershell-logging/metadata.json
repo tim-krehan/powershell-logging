@@ -1,6 +1,6 @@
 {
-  "version": "2.1.3",
-  "releasemessage": "Initial release on Powershell gallery",
+  "version": "3.0.0",
+  "releasemessage": "Add the Capabillity to work with multiple targets",
   "owner": "timkrehan",
   "author": "Tim Krehan",
   "description": "Add simple Logging to Powershell to apply to your script!",
