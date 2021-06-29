@@ -25,8 +25,8 @@ Write-Log ERROR   "write ERROR to both logfiles"
 # remove all targets, but the additional added target
 $log = Get-Log
 $obsoleteTarget = $log.Targets[0..1]
-$obsoleteTarget.GUID | ForEach-Object {Remove-LogTarget -GUID $_}
-$log.Targets
+$obsoleteTarget.GUID |
+  ForEach-Object { Remove-LogTarget -GUID $_ }
 
 # add another Target file
 Add-LogTarget -FullName "$workingDir\powershell2.log"
@@ -52,13 +52,27 @@ Write-Log WARNING "write WARNING to stream"
 Write-Log ERROR   "write ERROR to stream"
 
 # Open log from pipeline
-Get-ChildItem "$workingDir\PowerShell2.log" |Open-Log
-Get-ChildItem "$workingDir\PowerShell.log" |Add-LogTarget
+Get-ChildItem "$workingDir\PowerShell2.log" |
+  Open-Log
+
+Get-ChildItem "$workingDir\PowerShell.log" |
+  Add-LogTarget
 
 # Clear all log targets from  Pipeline
-#Get-Log |Select-Object -ExpandProperty Targets |Where-Object -Property Type -EQ File |Clear-LogTarget
-Get-Log |select -exp targets
+Get-Log |
+  Select-Object -ExpandProperty Targets |
+  Where-Object -Property Type -EQ File |
+  Clear-LogTarget
+
+Get-Log |
+  Select-Object -exp targets
 
 
-Get-Log |select -exp targets |? type -eq file |? {$_.fileinformation.name -like "powershell.log"} |Rename-LogTarget -NewName powershell3.log
-Get-ChildItem "$workingDir\PowerShell3.log" |Add-LogTarget
+Get-Log |
+  Select-Object -exp targets |
+  Where-Object type -eq file |
+  Where-Object { $_.fileinformation.name -like "powershell.log" } |
+  Rename-LogTarget -NewName powershell3.log
+
+Get-ChildItem "$workingDir\PowerShell3.log" |
+  Add-LogTarget
