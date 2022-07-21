@@ -24,12 +24,8 @@ jobs:
       - name: execute build.ps1
         shell: pwsh
         run: ./build.ps1
-      
-      # publish to the PowerShell Gallery
-      - name: Publish PowerShell Module
-        uses: pcgeek86/publish-powershell-module-action@v19
-        with:
-          # The filesystem path to the module to import into the environment.
-          modulePath: ./build/modules/powershell-logging
-          # The NuGet API Key for PowerShell Gallery, with permission to push this module.
-          NuGetApiKey: ${{ secrets.POWERSHELLGALLERYAPIKEY }}
+
+      - name: publish to PSGallery
+        shell: pwsh
+        run: |
+          Publish-Module -Path ./build/modules/powershell-logging -NuGetApiKey ${{ secrets.POWERSHELLGALLERYAPIKEY }}
