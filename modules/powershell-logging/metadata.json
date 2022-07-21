@@ -1,6 +1,6 @@
 {
-  "version": "3.0.0",
-  "releasemessage": "Add the Capabillity to work with multiple targets",
+  "version": "3.1.0",
+  "releasemessage": "Add ShowName Option to Log",
   "owner": "timkrehan",
   "author": "Tim Krehan",
   "description": "Add simple Logging to Powershell to apply to your script!",

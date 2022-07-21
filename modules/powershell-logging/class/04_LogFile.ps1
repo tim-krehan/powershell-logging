@@ -2,6 +2,7 @@ Class LogFile {
   [string]$Name
   [array]$LogLines
   [bool]$Active
+  [bool]$ShowName
   [LogTarget[]]$Targets
 
   LogFile($name) {
@@ -25,8 +26,12 @@ Class LogFile {
   }
 
   AddLine($severity, $message) {
+    $logName = $null
     if (!$this.Active) { throw "Log '$($this.Name)' is inactive! Open it again to use it." }
-    $logline = [LogLine]::new($severity, $message)
+    if($this.ShowName){
+      $logName = $this.Name
+    }
+    $logline = [LogLine]::new($severity, $message, $logName)
     $this.LogLines += $logline
     $this.Targets |Where-Object -Property Active -EQ -Value $true | ForEach-Object -Process {
       if ($null -eq $_) { continue }

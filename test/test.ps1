@@ -76,3 +76,11 @@ Get-Log |
 
 Get-ChildItem "$workingDir\PowerShell3.log" |
   Add-LogTarget
+
+Open-Log -Name PowerShell4 -LogPath $workingDir -ShowName
+Write-Log DEBUG   "write DEBUG within the current working directory"
+Write-Log VERBOSE "write VERBOSE within the current working directory"
+Write-Log INFO    "write INFO within the current working directory"
+Write-Log SUCCESS "write SUCCESS within the current working directory"
+Write-Log WARNING "write WARNING within the current working directory"
+Write-Log ERROR   "write ERROR within the current working directory"

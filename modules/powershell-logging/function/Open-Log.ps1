@@ -32,7 +32,10 @@ function Open-Log(){
         $ShowSuccess,
         
         [switch]
-        $ShowError
+        $ShowError,
+
+        [switch]
+        $ShowName
     )
     begin{
         if([string]::isnullorempty($PSBoundParameters.ShowInfo)){ $ShowInfo = $true }
@@ -50,6 +53,7 @@ function Open-Log(){
         if($ShowSuccess){$LogLevel += "SUCCESS"}
         if($ShowError){$LogLevel += "ERROR"}
         $Script:LogConnection = [LogFile]::new($Name)
+        $Script:LogConnection.ShowName = $ShowName
 
         switch($ConsoleType){
             "Host" {
