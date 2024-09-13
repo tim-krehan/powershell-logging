@@ -1,11 +1,11 @@
 Class LogTargetFile : LogTarget {
   [System.IO.FileSystemInfo]$fileInformation
   LogTargetFile($filePath) : base([LogTargetType]::File) {
-    try {
+    if(Test-Path -Path $filePath){
       $this.fileInformation = Get-Item -Path $filePath -ErrorAction Stop
     }
-    catch {
-      $this.fileInformation = New-Item -Path $filePath -ItemType File -Force
+    else{ 
+      $this.fileInformation = New-Item -Path $filePath -ItemType File -Force -ErrorAction Stop
     }
   }
 
