@@ -1,6 +1,6 @@
 {
-  "version": "3.1.0",
-  "releasemessage": "Add ShowName Option to Log",
+  "version": "3.1.1",
+  "releasemessage": "Update behaviour of initial file creation.",
   "owner": "timkrehan",
   "author": "Tim Krehan",
   "description": "Add simple Logging to Powershell to apply to your script!",
